@@ -1,0 +1,37 @@
+datas-models{
+	width:500px;
+	height: 100%;
+	display: block;
+
+	.filter{
+		padding:10px;
+		padding-left:15px;
+		border-bottom:1px solid #e1e1e1;
+
+		input{
+			
+		}
+	}
+
+	.models{
+		padding:10px;
+		.modelWrapper{
+			margin:5px;
+			cursor:pointer;
+
+			&.active{
+				> * {
+					border-color:purple
+				}
+			}
+
+			> *{
+				&:hover{
+					background-color:rgba(52, 152, 219,0.3);
+					border-color:rgba(52, 152, 219,1.0);
+					transition-duration:0.1s;
+				}
+			}
+		}
+	}
+}

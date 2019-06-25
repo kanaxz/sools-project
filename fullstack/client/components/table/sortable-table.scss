@@ -1,0 +1,27 @@
+.sortable-table {
+    width: 100%;
+
+    th {
+        .title {
+            width: 89%;
+            display: inline-block;
+            line-height: 30px;
+        }
+
+        .orderImg {
+            width: 9%;
+            line-height: 30px;
+            display: inline-block;
+            vertical-align: middle;
+            cursor: pointer;
+
+            &.asc {
+                transform: rotate(180deg);
+            }
+        }
+    }
+
+    .imgColumn {
+        text-align: center;
+    }
+}

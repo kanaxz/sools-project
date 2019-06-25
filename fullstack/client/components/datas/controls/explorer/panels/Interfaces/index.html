@@ -1,0 +1,13 @@
+<ui-list	
+	set="{
+		source:this.interfaces,
+		as:'modelInterface'	
+	}">
+	<template as="template">
+		<div
+			on:click="this.showInterface(modelInterface)" 
+			class="interface">
+			<label set="{innerText:lang(modelInterface.name)}"></label>
+		</div>
+	</template>
+</ui-list>

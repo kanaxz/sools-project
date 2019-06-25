@@ -1,0 +1,19 @@
+<div>
+	<wc-list
+		class="pages"
+		bind="{
+			items:this.@pagesIndexesArray
+		}">
+		<template as="itemTemplate">
+			<div
+				class="page"
+				bind:class="{
+					current:this.@currentIndex == item
+				}"
+				on:click="this.pageIndexClicked(item);"
+				expression>
+				{{item + 1}}
+			</div>
+		</template>
+	</wc-list>
+</div>

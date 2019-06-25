@@ -1,0 +1,21 @@
+@import "../../../../app/_theme";
+
+app-paginator{
+	display:block;
+	width:auto;
+
+	.pages{
+		display:block;
+		.page{
+			display:inline-block;
+			border:1px solid #eee;
+			padding:5px 13px;
+			cursor:pointer;
+			&.current,&:hover{
+				border-color:#3498db;
+				background-color:rgba(52,152,219,0.5);
+				color:#fff;
+			}
+		}
+	}
+}

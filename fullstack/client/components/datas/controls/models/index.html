@@ -1,0 +1,29 @@
+
+<div class="filter">
+	<label>Search</label>
+	<br>
+	<input 
+		on:keyup="this.filter(node.value)"/>
+</div>
+<app-loader
+		bind="{
+			loading:this.@querying
+		}">
+		<ui-list
+			class="models"
+			set="{
+				as:'model'
+			}"
+			bind="{
+				source:this.@models
+			}">
+			<template as="template">
+				<div
+					bind:class="{active:this.@currentModel == model}" 
+					class="modelWrapper"
+					on:click="this.event('modelClicked',model)"
+					init="node.appendChild(this.buildSimpleControl(model))">
+				</div>
+			</template>
+		</ui-list>
+</app-loader>

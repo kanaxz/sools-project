@@ -1,0 +1,28 @@
+context-menu{
+	display:block;
+	position:absolute;
+	width:150px;
+	height:auto;
+	background-color:#f5f5f5;
+	border:1px solid #e5e5e5;
+	box-shadow: 0px 0px 4px 0px #9b9b9b;
+	.menu-item{	
+		position:relative;
+	}
+
+	.item{
+		cursor: pointer;
+		padding:5px 10px;
+		border-bottom:1px solid #e5e5e5;
+		display: block;
+		cursor: pointer;
+		font-size:15px;
+		font-weight: lighter;
+		text-transform: uppercase;
+	}
+
+	.items{
+			display: block;
+			height: auto;	
+	}
+}

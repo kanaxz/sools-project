@@ -1,0 +1,80 @@
+app-notifier{
+	display:block;
+	position:absolute;
+	right:0;
+	top:0;
+	width:100%;
+	height:calc(100% - 20px);
+	pointer-events: none;
+	padding-top:50px;
+	z-index:320;
+	ui-list{
+		.notification{
+			clear:both;
+			float:right;
+			width:auto;
+			pointer-events: initial;
+			padding:5px 10px;
+			margin-bottom:10px;
+			cursor: pointer;
+			border:1px solid #000;
+			overflow: hidden;
+			&.removing{
+				opacity: 0;
+				height:0;
+				padding:0px 10px;
+				margin-bottom:0;
+				margin-right:-100px;
+				transition-duration:0.5s;
+			}
+
+			& > * {
+				vertical-align: middle;
+				display: inline-block;
+			}
+
+			.message{
+				color:#fff;
+				font-size:15px;
+			}
+
+			.icon{
+				width:30px;
+				height:30px;
+				margin-left:20px;
+			}
+
+			&.success{
+				background-color:#2ecc71;
+				border-color:#5c5;
+
+				.icon{
+					content:url('/assets/images/icons/success.svg')
+				}
+			}
+
+			&.info{
+				background-color:#3498db;
+				border-color:#55c;
+
+				.icon{
+					content:url('/assets/images/icons/info.svg')
+				}
+			}
+
+			&.error{
+				background-color:#c55;
+				border-color:#c55;
+
+				.message{
+					color:#fff;
+				}
+
+				.icon{
+					content:url('/assets/images/icons/alert.svg')
+				}
+			}
+
+		}
+	}
+}

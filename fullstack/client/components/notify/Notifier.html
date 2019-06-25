@@ -1,0 +1,27 @@
+<template as="defaultTemplate">
+          <div
+            init="node.classList.add(notification.type)" 
+            on:click="this.removeNotification(notification)"
+            bind:class="{
+              removing:notification.@removing
+            }"
+
+            class="notification">
+              <span
+                    class="message"
+                    set="{
+                      innerText:notification.message
+                    }">
+              </span><!--
+              --><img class="icon" />
+          </div>
+</template>
+
+<ui-list 
+  set="{
+    as:'notification',
+    template:this.templateFunction.bind(this),
+    source:this.notifications
+  }">
+</ui-list>
+

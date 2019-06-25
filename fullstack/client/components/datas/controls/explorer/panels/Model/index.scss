@@ -1,0 +1,39 @@
+explorer-model{
+	width:500px;
+	display: block;
+
+	.fields{
+		.field{
+			& > label{
+				text-transform: uppercase;
+			}
+
+			&.base{
+				& > label{
+
+					display: block;
+					padding-top:5px;
+					padding-left:10px;
+					font-size:12px;
+				}
+
+				& > *:not(label){
+					padding:10px;
+					padding-top:3px;
+				}
+				
+			}
+
+			&.association{
+				&	>label{
+					display: block;
+					width:100;
+					padding:10px;
+					border-bottom:1px solid #e1e1e1;
+					border-top:1px solid #e1e1e1;
+					background-color:#f1f1f1;
+				}
+			}
+		}
+	}
+}

@@ -1,0 +1,39 @@
+<ui-list
+	class="panels"
+	as="container"
+	set="{
+		source:this,
+		as:'panel'
+	}">
+	<template as="template">
+		<div class="panel">
+			<header>
+				<label 
+					class="title" 
+					set="{innerText:lang(panel.title)}">		
+				</label>
+				<ui-list class="actions"
+					set="{
+						source:panel.actions,
+						as:'action'
+					}">
+					<template as="template">
+						<i 	
+							init="node.classList.add('fa-' +action.icon)"
+							on:click="action.action.call(panel)"
+							class="fas"></i>
+					</template>
+					
+				</ui-list>	
+			</header>
+			
+			<app-loader
+				bind="{loading:!panel.@isInitialized}">
+				<div
+					init="node.appendChild(panel)">
+				</div>
+			</app-loader>
+		</div>
+		
+	</template>		
+</ui-list>

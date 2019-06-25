@@ -1,0 +1,16 @@
+progress-bar{
+	height:30px;
+
+	div{
+		position:absolute;
+		left:0;
+		top:0;
+		height: 100%;
+	}
+
+	label{
+		padding:10px 5px;
+		background-color:rgba(255,255,255,0.5);
+		color:#444;
+	}
+}

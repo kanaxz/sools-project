@@ -1,0 +1,22 @@
+explorer-interfaces{
+	width:300px;
+	padding:10px;
+	display: block;
+
+	ui-list{
+		.interface{
+			display: block;
+			width:100%;
+			padding:6px;
+			border:1px solid #e1e1e1;
+			margin-bottom:5px;
+			cursor:pointer;
+			transition-duration:0.1s;
+			&:hover{
+				background-color:rgba(52, 152, 219,0.3);
+				border-color:rgba(52, 152, 219,1.0);
+				transition-duration:0.1s;
+			}
+		}
+	}
+}

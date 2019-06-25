@@ -1,0 +1,19 @@
+<main-top-bar>
+</main-top-bar>
+<main-left-bar bind:class="{
+		open:UI.@menuOpen
+	}">
+</main-left-bar>
+<div 
+	bind:class="{
+		open:UI.@menuOpen,
+	}"
+	id="pre-container">
+		<app-loader  
+			bind="{
+				loading:this.@loading
+			}">
+			<div  id="container" attach>
+			</div>
+		</app-loader>
+</div>

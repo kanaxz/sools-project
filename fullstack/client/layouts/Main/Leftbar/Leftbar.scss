@@ -1,0 +1,104 @@
+$topbarHeight: 30px;
+$color1: #fff;
+$color3: #fff;
+$defaultTextColor: #444;
+main-left-bar {
+    height: calc(100% - 50px);
+    background-color: $color1;
+    display: inline-block;
+    width: 39px;
+    transition-duration: 0.2s;
+    overflow: hidden;
+
+    box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.3);
+    &.open {
+        width: 199px;
+        transition-duration: 0.2s;
+
+        #menu {
+            .menu-header {
+            }
+
+            .menu-item {
+                
+            }
+        }
+    }
+
+    #menu {
+        width: 200px;
+
+        .menu-header {
+            & > header {
+                border-bottom:1px solid #eaeaea;
+                line-height: 30px;
+
+                &  * {
+                    vertical-align: middle;
+                }
+
+                a {
+                    background-color:#ecf0f1;
+                    &.active{
+                        background-color:#3498db;
+                        
+                        label{
+                            color:#fff;    
+                        }
+                    }
+
+                     display: block;
+                     label {
+                        font-size: 13px;
+                        text-transform: uppercase;
+                        width:calc(100% - 30px);
+                        padding-left:4px;
+                        font-size:15px;
+                    }
+
+                    i {
+                        padding:8px;
+                        width:38px;
+                        font-size: 22px;
+                    }
+                }
+
+                
+
+                
+            }
+
+            & > .items{
+                display:block;
+            }
+        }
+
+        .menu-item {
+            text-decoration: none;
+            display: block;
+            line-height: 28px;
+            cursor: pointer;
+            padding-left:34px;
+           
+            a {
+                color:$defaultTextColor;
+                font-size: 13px;
+            }
+
+             &:hover{
+                    a{
+                        color:#fff;
+                    }    
+                }
+
+        }
+
+        #eventList{
+            .menu-item{
+                &:hover{
+                    background-color:rgba(52,152,219,0.7); 
+                }
+            }
+        }
+    }
+}

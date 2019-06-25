@@ -1,0 +1,55 @@
+<template as="menuItemTemplate">
+	<div class="menu-item">
+		<a 
+			view="{
+				redirect:menuItem.view
+			}"
+
+			set="{
+				innerText:menuItem.title
+			}"></a>
+	</div>
+</template>
+
+<hdr-list 
+	id="menu"
+	set="{
+		itemName:'menuHeader',
+		items:this.menu
+	}">
+	<template as="itemTemplate">
+		<div 
+			set="{
+				id:menuHeader.view
+			}"
+			class="menu-header">
+				<header>
+					<a 
+						view="{
+							name:menuHeader.view
+						}">
+						<i 
+							class="material-icons"
+							set="{
+								innerText:menuHeader.icon
+							}"></i>
+						<label
+							set="{
+								innerText:menuHeader.title
+							}">
+							
+						</label>
+					</a>
+				</header>
+				<hdr-list
+					class="items"
+					set="{
+						itemName:'menuItem',
+						itemTemplate:this.menuItemTemplate,
+						items:menuHeader.items
+					}">
+
+				</wc-list>
+		</div>	
+	</template>
+</wc-list>

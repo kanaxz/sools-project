@@ -1,0 +1,27 @@
+<template as="menuItemTemplate">
+	<div 
+		class="menu-item">
+		<label
+			class="item"
+			on:click="item.action()"
+			set="{
+				innerText:item.title
+			}">
+		</label>
+		<ui-list
+			class="items"
+			set="{
+				source:item.items,
+				template: this.menuItemTemplate
+			}">
+		</ui-list>
+	</div>
+</template>
+<ui-list
+	class="items"
+	set="{
+		source:this.datas,
+		as:'item',
+		template:this.menuItemTemplate
+	}">
+</ui-list>

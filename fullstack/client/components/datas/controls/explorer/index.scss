@@ -1,0 +1,62 @@
+// Here is where the magic happens
+datas-explorer {
+
+	.panels{
+		overflow-x: auto;
+		height: 100%;
+		display: flex;
+		.panel{
+			display: inline-block;
+			border-right:1px solid #e1e1e1;
+			height: 100%;
+			width:auto;
+			> header{
+				display:flex;
+				align-items: center;
+				width:100%;
+				border-bottom:1px solid #e1e1e1;
+				height: 40px;
+				> * {
+				}
+				.title{
+					flex:1;
+					font-size:17px;
+					margin-left:10px;
+				}
+
+				.actions{
+					float:right;
+					top:0;
+					height: 100%;
+					display: flex;
+					align-items:center;
+
+					> * {
+						justify-content: center;
+						text-align:center;
+						line-height: 40px;
+						cursor:pointer;
+						font-size:14px;
+						height: 100%;
+						width:40px;
+						border-left:1px solid #e1e1e1;
+
+						&:hover{
+							color:red;
+						}
+					}
+				}
+			}
+			
+
+			> app-loader{
+				height: calc(100% - 40px);
+				display: block;
+				.content{
+					height: 100%
+				}
+			}
+		}
+	}
+
+}

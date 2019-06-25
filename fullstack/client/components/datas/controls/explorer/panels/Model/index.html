@@ -1,0 +1,14 @@
+<ui-list
+	on:model-clicked="this.modelClicked(event.detail)"
+	class="fields"
+	set="{
+		source:this.properties,
+		as:'property'
+	}">
+	<template as="template">
+		<div class="field"
+			init="this.buildProperty(node, property)">
+			<label set="{innerText:lang(property.name)}"></label>
+		</div>
+	</template>
+</ui-list>

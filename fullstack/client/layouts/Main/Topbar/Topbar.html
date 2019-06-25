@@ -1,0 +1,52 @@
+<img  
+	on:click="UI.toggleMenu()" 
+	bind:class="{
+		open:UI.@menuOpen
+	}"
+	id="menu-img" 
+	src="/assets/images/icons/menu.svg"/>
+
+<a
+	view="{name:'home'}" >
+	<h1 
+		id="title">
+			Fullstack bro
+	</h1>
+</a>
+
+<div class="user">
+	<div class="user-infos"
+		bind:class="{
+			hide:!authService.@me
+		}">
+		<label id="user-name" bind="{
+			innerText: authService.@me ? authService.me.email : 'NOT CONNECTED'
+		}"></label>
+		<img 
+			class="open img-size-20" 
+			bind:class="{
+				active:this.@showFlyout
+			}"
+			on:click="this.showFlyout = !this.showFlyout"
+			src="/assets/images/icons/open-blue.svg">
+		<div
+			on:mouseleave="if(event.target == node)this.showFlyout = false"
+			bind:class="{
+				display:this.@showFlyout
+			}" 
+			class="flyout">
+				<div class="content">
+					<div
+						class="logout"
+						on:click="this.logout()">
+						<label>
+							Logout
+						</label>
+						<img
+							class="img-size-20" 
+							src="/assets/images/icons/logout.svg">
+					</div>
+				</div>
+		</div>
+	</div>
+</div>

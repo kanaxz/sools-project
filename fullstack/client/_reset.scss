@@ -1,0 +1,23 @@
+* { font-family:"Roboto"; font-weight:400; vertical-align: top; box-sizing: border-box; margin: 0; padding: 0; outline: none; font-family: "Roboto"; font-weight: 400; color: $grey900;}
+html, body { height: 100%;}
+
+a {	text-decoration: none;cursor:pointer;label{cursor:pointer;}}
+ol, ul { list-style: none;}
+blockquote, q { quotes: none;}
+blockquote:before, blockquote:after, q:before, q:after { content: ''; content: none;}
+table { border-collapse: collapse; border-spacing: 0;}
+
+*{
+	font-size:0
+}
+
+label{
+	cursor:inherit;
+}
+
+span, label, input, button{
+	font-size:14px
+}
+
+:focus { outline: none;}
+::-moz-focus-inner { border: 0;}
