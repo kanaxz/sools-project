@@ -6,11 +6,11 @@ class Route extends Process {
 		this.source = params.source;
 	}
 
-	execute(context, next){
-		var request = context.get(Request);
-		var datas = this.source(context);
+	execute(scope, next){
+		var request = scope.get(Request);
+		var datas = this.source(scope);
 		request.res.json(datas);
-		return super.execute(context, next);
+		return super.execute(scope, next);
 	}
 }
 

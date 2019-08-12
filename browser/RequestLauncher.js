@@ -9,20 +9,20 @@ class RequestLauncher extends Process {
         this.type = params.type
     }
 
-    execute(context, next) {
-        var xhr = context.get(XMLHttpRequest);
+    execute(scope, next) {
+        var xhr = scope.get(XMLHttpRequest);
         if (!xhr){
             xhr = new XMLHttpRequest();
-            context.push(xhr)
+            scope.push(xhr)
         }
-        var datas = this.source(context);
+        var datas = this.source(scope);
         return ajax({
             xhr: xhr,
             datas: datas,
             url: this.url,
             type:this.type
         }).then((xhr) => {
-            return super.execute(context, next);
+            return super.execute(scope, next);
         })
 
     }

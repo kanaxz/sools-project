@@ -2,7 +2,7 @@ var expect = require("chai").expect;
 const sools = require("sools");
 const ModelInterfaces = require("../ModelInterfaces");
 const models = require("./models");
-const Context = require("sools-process/Context");
+const Scope = require("sools-process/Scope");
 const MemorySource = require("../memory/Source");
 const Stores = require("../storing/Stores");
 describe("querying", function() {
@@ -22,7 +22,7 @@ describe("querying", function() {
                 id: 2,
                 name: 'admin'
             }, {
-                id: 2,
+                id: 3,
                 name: 'readers'
             }],
             memberships: [{
@@ -55,7 +55,7 @@ describe("querying", function() {
             .then(new Stores())
             .then(source)
         return;
-        return datas.setup(new Context())
+        return datas.setup(new Scope())
             .then(() => {
                 return datas.users.get().where({
                     name: 'cédric'
@@ -63,18 +63,18 @@ describe("querying", function() {
             })
             .then((cedric) => {
                 return cedric.memberships.get()
-                    .then((groups) => {
-                        groups.hold();
-                        return groups[0].delete()
+                    .then((memberships) => {
+                        memberships.hold();
+                        return memberships[0].delete()
                             .then(() => {
                                 debugger
-                                expect(groups.length).to.equal(1);
+                                expect(memberships.length).to.equal(1);
                                 return
-                                return cedric.groups.remove().where(groups[0])
+                                return cedric.memberships.delete().where(memberships[0])
                             })
                             .then(() => {
                                 return
-                                expect(groups.length).to.equal(0);
+                                expect(memberships.length).to.equal(0);
                             })
                     })
             })

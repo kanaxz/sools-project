@@ -4,13 +4,13 @@ const sools = require("sools");
 const Mongo = require("sools-mongo/Process");
 const ModelInterfaces = require("sools-data/ModelInterfaces");
 const models = require("../shared/models");
-const Context = require("sools-process/Context");
+const Scope = require("sools-process/Scope");
 
 var modelInterfaces = new ModelInterfaces([models.user])
     .then(new Mongo('mongodb://localhost:27017', 'zenyo'))
 
 modelInterfaces
-    .setup(new Context())
+    .setup(new Scope())
     .then(() => {
         var start = new Date();
         return modelInterfaces.users.get().include("userGroups.group").then((users) => {
@@ -22,5 +22,5 @@ modelInterfaces
         console.error(err);
     })
     .finally(() => {
-        return modelInterfaces.stop(new Context())
+        return modelInterfaces.stop(new Scope())
     })

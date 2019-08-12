@@ -5,15 +5,15 @@ class Process extends Base {
         super();
     }
 
-    setup(context, next) {
+    setup(scope, next) {
         return next();
     }
 
-    execute(context, next) {
+    execute(scope, next) {
         return next();
     }
 
-    stop(context, next){
+    stop(scope, next){
     	return next();
     }
 }

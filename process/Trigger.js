@@ -3,20 +3,20 @@ var Flow = require("./Flow");
 class Trigger extends Flow {
 
 
-    setup(context) {
-        return super.setup(context, () => {
+    setup(scope) {
+        return super.setup(scope, () => {
             return Promise.resolve(0)
         })
     }
 
-    execute(context) {
-        return super.execute(context, () => {
+    execute(scope) {
+        return super.execute(scope, () => {
             return Promise.resolve(0)
         })
     }
 
-    stop(context) {
-        return super.stop(context, () => {
+    stop(scope) {
+        return super.stop(scope, () => {
             return Promise.resolve(0)
         })
     }

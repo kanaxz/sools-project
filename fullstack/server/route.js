@@ -8,8 +8,8 @@ const Response = require("sools-express/Response");
 const express = require("./express");
 var route = new Route(express, "/datas")
     .then(new Builder({
-        source: (context) => {
-            var datas = context.components.get(Request).body;
+        source: (scope) => {
+            var datas = scope.components.get(Request).body;
             return datas.queries
         },
         type: Query,
@@ -17,8 +17,8 @@ var route = new Route(express, "/datas")
     }))
     .then(datas)
     .then(new Response({
-        source: (context) => {
-            var queries = context.components.getAll(Query);
+        source: (scope) => {
+            var queries = scope.components.getAll(Query);
 
             var results = queries.map((query) => {
                 return query.resultToJSON();

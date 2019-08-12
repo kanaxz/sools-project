@@ -7,17 +7,17 @@ class Dynamic extends Process {
         this.executeFn = executeFn;
     }
 
-    setup(context, next) {
+    setup(scope, next) {
            if (this.setupFn)
-            return this.setupFn(context, next);
+            return this.setupFn(scope, next);
         else
             return next();
     }
 
 
-    execute(context, next) {
+    execute(scope, next) {
         if (this.executeFn)
-            return this.executeFn(context, next);
+            return this.executeFn(scope, next);
         else
             return next();
     }

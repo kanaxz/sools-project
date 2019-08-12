@@ -6,8 +6,8 @@ class SetupFeed extends Process {
         this.component = component;
     }
 
-    setup(context) {
-        context.components.push(this.component)
+    setup(scope) {
+        scope.components.push(this.component)
     }
 }
 

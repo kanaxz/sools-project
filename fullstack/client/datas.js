@@ -8,15 +8,15 @@ var modelInterfaces = new ModelInterfaces(models)
     .then(new RequestLauncher({
         url: '/datas',
         type: 'POST',
-        source: (context) => {
+        source: (scope) => {
             return {
-                queries: context.getAll(Query)
+                queries: scope.getAll(Query)
             }
         }
     }))
-    .then(function(context, next) {
-        var xhr = context.get(XMLHttpRequest);
-        var queries = context.getAll(Query);
+    .then(function(scope, next) {
+        var xhr = scope.get(XMLHttpRequest);
+        var queries = scope.getAll(Query);
         var results = JSON.parse(xhr.responseText);
         for (var i = 0; i < queries.length; i++) {
             queries[i].setResult(modelInterfaces, results[i])

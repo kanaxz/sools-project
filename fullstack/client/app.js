@@ -1,4 +1,4 @@
-const Context = require("sools-process/Context");
+const Scope = require("sools-process/Scope");
 const datas = require("./datas");
 const navigator = require("./navigator");
 const notifyService = require("./components/notify/service")
@@ -38,7 +38,7 @@ var app = {
     },
     start: function() {
         var root = document.getElementById("root");
-        var setup = new Context();
+        var setup = new Scope();
         return datas.setup(setup)
             .then((users) => {
                 return root.start(this);

@@ -7,7 +7,7 @@ class MysqlProcess extends Process{
 		this.source = new Source(options);
 	}
 
-	setup(context, next){
+	setup(scope, next){
 		return next();
 	}
 }

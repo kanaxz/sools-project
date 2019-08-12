@@ -18,6 +18,8 @@ var baseMixin = (base) => {
         }
     }
 
+    Base.isBase = true;
+
     return Base
 }
 

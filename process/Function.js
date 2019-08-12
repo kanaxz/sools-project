@@ -4,9 +4,9 @@ class Function extends Process {
 		this.fn = fn;
 	}
 
-	execute(context){
-		this.fn(context);
-		super.execute(context);
+	execute(scope){
+		this.fn(scope);
+		super.execute(scope);
 	}
 }
 

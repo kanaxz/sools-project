@@ -1,5 +1,5 @@
 var config = require('./config')
-const Context = require("sools-process/Context");
+const Scope = require("sools-process/Scope");
 var http = require("http");
 const express = require("./express");
 const route = require("./route");
@@ -8,7 +8,7 @@ var routesConfig = require("./routes");
 require('./components/passport/setup');
 
 
-route.setup(new Context())
+route.setup(new Scope())
     .then(() => {
     	routesConfig();
         /**/

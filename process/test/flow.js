@@ -1,7 +1,7 @@
 var expect = require("chai").expect;
 
 var sools = require("sools");
-var Context = require("sools/process/Context");
+var Scope = require("sools/process/Scope");
 var Dynamic = require("sools/process/Dynamic");
 var Flow = require("sools/process/Flow");
 describe("Flow", function() {
@@ -15,18 +15,18 @@ describe("Flow", function() {
 
         var flow = new Flow();
         flow.then(new Dynamic(
-            (context, next) => {
-            	context.components.push(new Number(5))
+            (scope, next) => {
+            	scope.components.push(new Number(5))
             	return next();
-            }, (context, next) => {
+            }, (scope, next) => {
 
             }))
-        var setupContext = new Context();
-        return flow.setup(setupContext,()=>{
+        var setupScope = new Scope();
+        return flow.setup(setupScope,()=>{
         	return Promise.resolve(0)
         }).then(()=>{
         	
-        	var number = setupContext.components.get(Number);
+        	var number = setupScope.components.get(Number);
         	expect(number.value).to.equal(5)
         	return 0
         })

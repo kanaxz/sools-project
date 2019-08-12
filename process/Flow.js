@@ -7,24 +7,24 @@ class Flow extends Process {
         this.process = [];
     }
 
-    _process(methodName, context, next) {
+    _process(methodName, scope, next) {
         return arrayUtils.chain(this.process, (process, next)=>{
-            return process[methodName](context, next);
+            return process[methodName](scope, next);
         },()=>{
             return Promise.resolve(0)
         }).then(next);
     }
 
-    setup(context, next) {
-        return this._process("setup", context, next);
+    setup(scope, next) {
+        return this._process("setup", scope, next);
     }
 
-    execute(context, next) {
-        return this._process("execute", context, next);
+    execute(scope, next) {
+        return this._process("execute", scope, next);
     }
 
-    stop(context, next) {
-        return this._process("stop", context, next);
+    stop(scope, next) {
+        return this._process("stop", scope, next);
     }
 
     then(process) {

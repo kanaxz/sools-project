@@ -1,7 +1,7 @@
 var expect = require("chai").expect;
 
 var sools = require("sools");
-var Context = require("sools/process/Context");
+var Scope = require("sools/process/Scope");
 var Trigger = require("sools/process/Trigger");
 var Dynamic = require("sools/process/Dynamic");
 var Builder = require("sools/process/Builder");
@@ -67,8 +67,8 @@ describe("Builder", function() {
             }
         }
 
-        var context = new Context();
-        context.components.push(new Data({
+        var scope = new Scope();
+        scope.components.push(new Data({
             mainBottom: {
                 type: {
                     name: 'bottom1'
@@ -96,21 +96,21 @@ describe("Builder", function() {
         var trigger = new Trigger();
         trigger
             .then(new Builder({
-                source: (context) => {
-                    return context.components.get(Data).content;
+                source: (scope) => {
+                    return scope.components.get(Data).content;
                 },
                 type: Top
             }))
-            .then(new Dynamic((context, next) => {
-                context.components.push(Bottom1, Bottom2)
+            .then(new Dynamic((scope, next) => {
+                scope.components.push(Bottom1, Bottom2)
                 return next();
             }))
 
 
-        return trigger.setup(new Context()).then(() => {
-            return trigger.execute(context)
+        return trigger.setup(new Scope()).then(() => {
+            return trigger.execute(scope)
         }).then(() => {
-            var top = context.components.get(Top);
+            var top = scope.components.get(Top);
             expect(top.mainBottom instanceof Bottom1).to.equal(true)
             expect(top.bottoms[0] instanceof Bottom2).to.equal(true)
             expect(top.bottoms[1] instanceof Bottom1).to.equal(true)

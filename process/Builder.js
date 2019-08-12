@@ -16,10 +16,10 @@ class Builder extends Process {
         this.options = params.options || [];
     }
 
-    feedOptions(context, type) {
+    feedOptions(scope, type) {
         if (type.dependencies.has(Uniqueable)) {
 
-            var instances = context.components.getAll(type);
+            var instances = scope.components.getAll(type);
             if (instances.length != 0) {
 
                 this.options.push(new Instances(type, instances));
@@ -27,13 +27,13 @@ class Builder extends Process {
         }
 
         if (type.dependencies.has(Typeable)) {
-            var types = context.components.filter((c) => {
+            var types = scope.components.filter((c) => {
                 return c.prototype instanceof type;
             });
             if (types.length != 0) {
                 this.options.push(new Types(type, types));
                 for (var subType of types)
-                    this.feedOptions(context, subType)
+                    this.feedOptions(scope, subType)
             }
         }
 
@@ -42,7 +42,7 @@ class Builder extends Process {
             for (var prop of type.properties) {
                 if (prop instanceof propertyTypes.array || prop instanceof propertyTypes.object) {
                     if (prop.type) {
-                        this.feedOptions(context, prop.type)
+                        this.feedOptions(scope, prop.type)
                     }
                 }
             }
@@ -50,24 +50,24 @@ class Builder extends Process {
 
     }
 
-    setup(context, next) {
-        return super.setup(context, next).then(() => {
-            this.feedOptions(context, this.type);
+    setup(scope, next) {
+        return super.setup(scope, next).then(() => {
+            this.feedOptions(scope, this.type);
         })
     }
 
-    execute(context, next) {
-        var object = this.source(context);
+    execute(scope, next) {
+        var object = this.source(scope);
         if (this.isArray) {
             for (var obj of object) {
                 var result = this.type.build(obj, this.options);
-                context.components.push(result);
+                scope.components.push(result);
             }
         } else {
             var result = this.type.build(object, this.options);
-            context.components.push(result);
+            scope.components.push(result);
         }
-        return super.execute(context, next);
+        return super.execute(scope, next);
     }
 }
 
