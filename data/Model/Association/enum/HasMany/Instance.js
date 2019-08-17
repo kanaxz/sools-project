@@ -1,7 +1,7 @@
 const sools = require("sools");
 const Array = require("sools-define/Array");
-const Models = require("../../Models");
-module.exports = sools.define(Models, (base) => {
+const Model = require("../../index");
+module.exports = sools.define(Array.of(Model), (base) => {
     class HasMany extends base {
         constructor(property) {
             super();

@@ -1,4 +1,4 @@
-const Association = require("./Association");
+const Association = require("../index");
 
 class HasOne extends Association {
     constructor(values) {

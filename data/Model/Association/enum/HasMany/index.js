@@ -1,8 +1,8 @@
 const sools = require("sools");
-const Association = require("../../Association");
+const Association = require("../../index");
 const Instance = require("./Instance");
 const HasOne = require("../HasOne");
-const ModelInterfaces = require("../../ModelInterfaces");
+const ModelInterfaces = require("../../../../ModelInterfaces");
 
 class HasMany extends Association {
 

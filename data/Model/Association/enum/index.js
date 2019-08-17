@@ -1,6 +1,6 @@
 var associations = {
-	hasOne:require(".associations/HasOne"),
-	hasManyThrough:require("./associations/HasMany"),
+	hasOne:require("./HasOne"),
+	hasManyThrough:require("./HasMany"),
 	/*
 	bool:require("./bool/Property"),
 	number:require("./number/Property"),

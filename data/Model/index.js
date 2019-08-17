@@ -1,6 +1,6 @@
 var sools = require("sools");
 var Typeable = require("sools-define/Typeable");
-var ModelType = require("./ModelType");
+var Type = require("./Type");
 var Propertiable = require("sools-define/Propertiable");
 var Identifiable = require("sools-define/Identifiable");
 var Values = require("sools/Values");
@@ -12,7 +12,7 @@ module.exports = sools.define([
     class Model extends base {
         static define(args){
             var type = args.find((arg) => {
-                return arg instanceof ModelType;
+                return arg instanceof Type;
             })
             if (type) {
                 this.type = type;

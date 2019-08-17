@@ -22,22 +22,6 @@ var arrayUtilities = {
         options.backward = true;
         return arrayUtilities.chain(array, fn, final, options);
     },
-    join: (array, lambda, separator) => {
-        var result;
-        var first = true;
-        for (var object of array) {
-            var tmp = lambda(object);
-            if (tmp != null) {
-                if (first)
-                    result = "";
-                else
-                    result += separator;
-                result += tmp;
-                first = false;
-            }
-        }
-        return result;
-    },
     forEachAsync: function(array, it) {
         var work = function(i) {
             if (i < array.length) {

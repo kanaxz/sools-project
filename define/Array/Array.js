@@ -4,9 +4,15 @@ var Properties = require("../Properties");
 var sools = require("sools");
 const Event = require("sools/Event");
 const rawMixin = require("sools/Array/rawMixin");
-module.exports = sools.proxy([Propertiable()], (base, options) => {
+
+
+var ofs = [];
+var proxy = sools.proxy([Propertiable()], (base, options) => {
     options = options || {};
+
+    
     class Array extends rawMixin(base) {
+
         static define(args) {
             args.push(new Properties({
                 content: Properties.types.array({
@@ -46,3 +52,16 @@ module.exports = sools.proxy([Propertiable()], (base, options) => {
     return Array;
 
 })
+
+proxy.of = function(classObject){
+    var existing = ofs.find((of)=>of[0] == classObject);
+    if(existing)
+        return existing;
+    var newOf = sools.define([this({
+        type:classObject
+    })])
+    ofs.push(newOf);
+    return newOf;       
+}
+
+module.exports = proxy;
