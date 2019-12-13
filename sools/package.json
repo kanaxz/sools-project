@@ -3,11 +3,14 @@
     "version": "1.0.0",
     "description": "",
     "main": "index.js",
-    "dependencies": {},
+    "dependencies": {
+        "rooty": "^2.0.0"
+    },
     "author": "",
     "license": "ISC",
     "scripts": {
-        "test": "mocha $(find ./test -name '*.js')",
+        "test-debug": "nodemon --exec \"mocha --inspect-brk $(find ./test -name '*.test.js')\"",
+        "test": "mocha  $(find ./**/test -name '*.js')",
         "mocha": "mocha"
     },
     "devDependencies": {
