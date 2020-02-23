@@ -4,7 +4,8 @@ const Property = require("../../propertying/Property");
 class Association extends Property {
 	constructor(params){
 		super(params);
-		this.onDelete = params.onDelete;
+        if(params)
+		  this.onDelete = params.onDelete;
 	}
 
     modelAttached(model, value) {

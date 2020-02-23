@@ -76,9 +76,9 @@ module.exports = sools.mixin([Buildable(), Comparable()], (base) => {
 
         constructor(...args) {
             super(...args);
-            var values = args.find((arg)=>{
-                return arg instanceof Values;
-            })
+            var values;
+            if(args.length == 1)
+                values = args[0];
             this._values = {};
 
             if (values) {

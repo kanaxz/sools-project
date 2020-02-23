@@ -13,45 +13,13 @@ module.exports = sools.define(Array.of(Model), (base) => {
             return this.property.type;
         }
 
-        loaded() {
-            this.isLoaded = true;
+        async load(){
+            //this.datas.execute()
         }
 
         attach(model) {
             this.model = model;
-            this.throughModelInterface = this.model.modelInterface.modelInterfaces.get(this.property.through.type)
-            //this.modelInterface = this.model.modelInterface.modelInterfaces.get(this.property.type);
-        }
-
-        toJSON() {
-            return this.content;
-        }
-
-        add(models) {
-            return this.throughModelInterface.add(models.map((model) => {
-                model[this.property.through.this] = this.model.identity()
-                return model;
-            }))
-        }
-
-        update(){
-
-        }
-
-        delete() {
-            return this.throughModelInterface
-                .delete()
-                .where({
-                    [this.property.through.this]: this.model.identity()
-                })
-        }
-
-        get() {
-            return this.throughModelInterface
-                .get()
-                .where({
-                    [this.property.through.this]: this.model.identity()
-                })
+            this.datas = model.datas;
         }
     }
 

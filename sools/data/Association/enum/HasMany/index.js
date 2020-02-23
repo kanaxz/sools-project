@@ -2,7 +2,7 @@ const sools = require("../../../../sools");
 const Association = require("../../index");
 const Instance = require("./Instance");
 const HasOne = require("../HasOne");
-const ModelInterfaces = require("../../../ModelInterfaces");
+//const ModelInterfaces = require("../../../ModelInterfaces");
 
 class HasMany extends Association {
 
@@ -31,6 +31,8 @@ class HasMany extends Association {
 
     attachType(ownerType) {
         super.attachType(ownerType);
+        return
+        // ??
         if(!this.through)
             this.through = this.ownerType.type.name;
     }

@@ -1,15 +1,21 @@
-var Tree = require("../Tree");
 var sools = require("../sools");
-module.exports = sools.define(Tree, (base) => {
 
-    class Scope extends base {
-    	
-	    get(type) {
-	        return this.find((c) => {
-	            return c instanceof type
-	        })
-	    }
-    }
+class Scope  {
+	
+}
 
-    return Scope;
+var proxy = new Proxy(Scope,{
+	construct(target,args){
+		return new Proxy(new Scope(),{
+			get(scope,property){
+				if(scope[property])
+					return scope[property]
+				else if(scope.parent)
+					return scope.parent[property];
+			}
+		})
+	}
 })
+
+
+module.exports = proxy;

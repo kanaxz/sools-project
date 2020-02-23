@@ -9,6 +9,13 @@ module.exports = (base) => {
 
         }
 
+        get length(){
+            var count = 0;
+            for(var obj of this)
+                count++
+            return count
+        }
+
         forEach(fn) {
             for (var object of this) {
                 fn(object);

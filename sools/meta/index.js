@@ -7,5 +7,8 @@ module.exports = {
         if (result === null)
             result = [];
         return result;
+    },
+    getParamName:function(func){
+    	return this.getParamNames(func)[0];
     }
 }

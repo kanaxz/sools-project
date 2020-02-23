@@ -92,7 +92,7 @@ var sools = {
                     this.processDependencies(result, dependency.mixin.dependencies);
                 }
                 result.dependencies.push(dependency);
-                if (dependency.mixin.definitions)
+                if (dependency.mixin.definitions.length)
                     result.definitions.push(dependency.mixin.definitions)
             } else {
                 // dependency already added
@@ -195,7 +195,7 @@ var sools = {
         type.dependencies = new Dependencies(result.dependencies);
         type.define(definitions);
         return (type);
-    }
+    },
 }
 
 
