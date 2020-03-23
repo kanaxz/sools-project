@@ -13,7 +13,8 @@ var virtualPropertyMapping =  [
     ['string',()=>({type:virtualTypes.string})],
     ['hasMany',(property)=>({
         type:virtualTypes.hasMany,
-        model:property.model.virtual
+        model:property.model.virtual,
+        load:property.load
     })]
 ]
 
@@ -21,7 +22,8 @@ var propertyMapping = [
   ['number',()=>(propertyTypes.number())],
   ['string',()=>(propertyTypes.string())],
   ['hasMany',(property)=>(propertyTypes.hasMany({
-    type:property.model.type
+    type:property.model.type,
+    load:property.load
   }))]
 
 ]
@@ -48,7 +50,8 @@ class TypeDescription {
       }
       else{
         virtualProperties[propertyName] = {
-          type:property.type.virtual
+          type:property.type.virtual,
+          load:property.load
         }
       }
       var tkv = propertyMapping.find((tkv)=>tkv[0] == property.type)
@@ -109,13 +112,32 @@ var Data = {
                 }
             }
             else if(property instanceof Array){
-                property = {
-                    type:'hasMany',
-                    model:result[property[0]]
+              property = {
+                type:'hasMany',
+                model:result[property[0]],
+                load:(model,hasMany)=>{
+                  return hasMany.filter((subModel)=>{
+                    return subModel[modelName].eq(model)
+                  })
                 }
+              }
             }
             if(result[property.type]){
             	property.type = result[property.type];
+              if(property.has === false){
+                property.load = (m,models)=>{
+                  return models.filter((subModel)=>{
+                    return m.eq(subModel[model.name])
+                  })
+                }
+              }
+              else if(!property.load){
+                property.load = (m,models)=>{
+                  return models.filter((subModel)=>{
+                    return m[property.type.name].eq(subModel)
+                  })
+                }
+              }
             }
             model.properties[propertyName] = property;
         }

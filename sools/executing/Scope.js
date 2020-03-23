@@ -1,113 +1,84 @@
 const Path = require("./Path");
 const Source = require("../virtualizing/Source")
-const SourcesEnum = require("../virtualizing/Source/enum")
-
-var statmentHandlers = {
-	return:async (scope,statment)=>{
-		return await scope.source.processArg(scope,statment.args[0]);
-	},
-	functionCall:async (scope,statment)=>{
-		
-	},
-	assignation:async(scope,statment)=>{
-		scope.setSource(statment.args[1].source,await scope.source.processArg(scope,statment.args[0]));
-	}
-}
+const Sources = require("../virtualizing/Source/enum")
+const Executable = require("./Executable")
 
 module.exports = class Scope{
 	constructor(source){
 		this._source = source;
 		this.parent = null;
-		this.sources = [];
+		this.values = [];
 	}
 
 	get source(){
 		return this._source || this.parent.source
 	}
 
-	async getValue(...args){
-		if(args.length == 2){
-			var arg = args[0]
-			var source = arg.source;
-			var path = args[1];
-			var split = path.split(".")
-			if(!(source instanceof Source)){
-				return source
-			}
-			else if(source instanceof SourcesEnum.values){
-				
-				var current = source;
-				for(var segment of split)
-					current = current[segment];
-				return current
-			}
-			else if(source instanceof SourcesEnum.property){
-				return this.getValue(source.source,source.path + "." + path);
-			}
-			else if(source instanceof SourcesEnum.var){
-				var result = this.getVar(source);
-				if(result  instanceof Path){
-					return [result.value,path].join(".");
-				}
-				else{
-					for(var segment of split)
-						result = result[segment];
-					return result;
-				}
-			}
-			else if(source instanceof SourcesEnum.functionCall){
-				debugger
-				var result = await this.source.processArg(this,arg);
-				if(result  instanceof Path){
-					return [result.value,path].join(".");
-				}
-				else{
-					for(var segment of split)
-						result = result[segment];
-					return result;
-				}
-			}
-		}
-		else{
-			var path = args[0]
+	async executeExecutable(executable){
+		debugger
+		return await executable.execute();
+	}
+
+	async getValuePath(value, path){
+		if(value instanceof Executable)
+			value = await this.executeExecutable(value)
+		if(value instanceof Path)
+			return new Path([value.value , path].filter((s)=>s).join("."))
+		else if(path){
 			var split = path.split(".");
-			var source = this.getSource(split[0]);
-			split.shift()
-			if(source  instanceof Path){
-				return [source.value,...split].join(".");
-			}
-			else{
-				for(var segment of split)
-					source = source[segment];
-			}
-			return source;
+			var result = value;
+			for(var segment of split)
+				result = result[segment];
+			return result;
+		}
+		else
+			return value
+
+	}
+
+	async getValue(arg, path){
+		if((arg.source instanceof Sources.functionCall) || typeof(arg.source) == "undefined"){
+			return await this.getValuePath(await this.source.processArg(this,arg),path)
+		}
+		else if(!(arg.source instanceof Source) || arg.source instanceof Sources.values){
+			return await this.getValuePath(arg.source,path);
+		}
+		else if(arg.source instanceof Sources.property){
+			return await this.getValuePath(await this.getValue(arg.source.source),[arg.source.path,path].filter((s)=>s).join("."));
+		}
+		else if(arg.source instanceof Sources.var){
+			var pair = this.getPair(arg)
+			var value;
+			if(!pair)
+				value = await this.source.processArg(this,arg)
+			else
+				value = pair.value
+			return await this.getValuePath(pair.value,path);
 		}
 	}
 
-
-	getVar(variable){
-		return this.getSource("$" + variable.name)
+	getPairs(arg){
+		return [...this.values.filter((kv)=>kv.arg.source == arg.source),...((this.parent && this.parent.getPairs(arg)) || [])]
 	}
 
-	getSource(key){
-		for(var sourceKeyPair of this.sources){
-			if(sourceKeyPair.key == key)
-				return sourceKeyPair.source;
-		}
-		return this.parent && this.parent.getSource(key);
+	getPair(arg){
+		var pair = this.values.reverse().find((kv)=>kv.arg.source == arg.source);
+		if( pair)
+			return pair
+		return this.parent && this.parent.getPair(arg);
 	}
 
-	setSource(key,source){
-		this.sources.push({key,source});
+	setValue(arg,value){
+		this.values.push({arg,value});
 	}
 
 	async process(vscope){
-		for(var statment of vscope.statments){
-			if(statment.type == "return"){
-				return await statmentHandlers.return(this,statment);
+		for(var statement of vscope.statements){
+			if(statement.functionCall.function.source.name == "return"){
+				return await this.source.processFunctionCall(this,statement.functionCall);
 			}
 			else{
-				await statmentHandlers[statment.type](this,statment)
+				await this.source.processFunctionCall(this,statement.functionCall);		
 			}
 		}
 	}

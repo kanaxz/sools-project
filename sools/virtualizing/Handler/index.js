@@ -1,15 +1,23 @@
 const utils = require("../utils")
 const Options = require("./Options")
 const Reference = require("./Reference");
-const Statment = require("../Statment");
+const Statement = require("../Statement");
 const Sources = require("../Source/enum/")
+const Assignment = require("../functions/Assignment")
 
-module.exports = class Handler {
+var id = 0;
+class Handler {
 	constructor(options){
 		var source = options.source;
+		this.id  = id++
 		this.virtual = options.virtual;
 		this.typeName = this.virtual.constructor.typeName;
+		/*
+		if(source && source.path)
+			console.log(this.id,source.path,!!options.ref)
+		/**/
 		this.ref = options.ref || new Reference();
+		this.ref.type = this.virtual.constructor;
 		if(source == null)
 			return
 
@@ -21,73 +29,63 @@ module.exports = class Handler {
 		if(!scope)
 			scope = source.scope;
 		if(source instanceof Sources.var){
+			if(!scope.vars)
+				debugger
 			scope.vars.push(this);
 		}
 		this.scope = scope;
 		this.source = source;
-
-	}
+		
+	}	
 
 	clone(options){
 		options = options || {}
 		if(!options.ref)
 			options.ref = this.ref;
-		if(!options.scope)
-			options.scope = this.scope;
 		if(!options.source)
 			options.source = this.source;
+		if(!options.scope){
+			if(options.source && options.source.scope)
+				options.scope = options.source.scope
+			else
+				options.scope = this.scope;
+		}
+		
 		options = new Options(options);
 		return new (this.cloneConstructor())(options);
 	}
 
 	processSource(arg){
-		
 		if(arg.source instanceof Sources.functionCall){	
-
-			debugger
-			if(arg.source.statment == arg.scope.lastStatment){
-				arg.scope.statments.find((statment)=>statment.function == source);
-				return
-				if(arg.scope == this.scope){
-					sourceScope.statments.splice(-1,1)
-					sourceScope.removedStatments.push({
-						index:sourceScope.statments.length,
-						functionCall:source
-					})	
-				}
-				else{
-					arg.scope.statments.find((statment)=>statment.function == source);
-				}
-				
-			}
+			if(arg.scope == arg.scope.target && arg.source == arg.scope.lastStatment.functionCall){
+				arg.scope.statements.splice(-1,1)
+				arg.scope.removedStatements.push({
+					index:arg.scope.statements.length,
+					statement:arg.source.statement
+				})	
+			}		
 			else{
-
-				var removedStatmentIndex = arg.scope.removedStatments.findIndex((rs)=>rs.functionCall == arg.source);
-				if(removedStatmentIndex != -1){
-					arg.scope.statments.splice(arg.scope.removedStatments[removedStatmentIndex].index,0,arg.source.statment);
-					arg.scope.removedStatments.splice(removedStatmentIndex,1)
+				var removedStatement = arg.scope.removedStatements.find((rs)=>rs.statement.functionCall == arg.source);
+				if(removedStatmentIndex){
+					var index = arg.scope.removedStatements.indexOf(removedStatement);
+					arg.scope.statements.splice(index,0,removedStatement.statement);
+					arg.scope.removedStatements.splice(index,1)
 				}
 				var variable = this.clone({
 					source:utils.gererateVariableId(),
-					scope:this.scope
+					scope:arg.scope
 				});
-				var index = arg.scope.statments.indexOf(arg.source.statment);
+				var index = arg.scope.statements.indexOf(arg.source.statment);
 				if(index == -1)
 					throw new Error()
-				arg.scope.statments.splice(index,1,new Statment({
-					function:functions.assignation,
+				arg.scope.statements.splice(index,1,new Statment(new Sources.functionCall({
+					scope:arg.scope,
+					function:Assignment,
 					args:[this.clone({scope:arg.scope,source: arg.source}),variable]
-				}));
+				})));
 				arg.source = variable._handler.source;
 			}
-				/**/
-		}
-		
-		else if(arg.source  instanceof Sources.property){
-			if(arg.source.source)
-				this.processSource(arg.source);
-		}
-		/**/
+		}		
 		return this;	
 	}
 
@@ -106,7 +104,7 @@ module.exports = class Handler {
 			source:this,
 			path:property.name
 		});
-		var args = property.type.handler.callAsProperty(this.scope, property);
+		var args = property.type.handler.callAsProperty(this.scope, property,this.ref.refs[property.name]);
 		//this.scope.processArg(this)
 		var virtual = new property.type(new Options({
 			source,
@@ -114,6 +112,7 @@ module.exports = class Handler {
 			...args,
 			ref:this.ref.refs[property.name]
 		}))
+
 		this.ref.refs[property.name] = virtual._handler.ref;
 		this.scope.env.workers.forEach((worker)=>{
 			worker.onPropertyGet(property, this.virtual,virtual)
@@ -124,6 +123,18 @@ module.exports = class Handler {
 	static callAsProperty(){
 		return {};
 	}
+
+	static buildArg(scope,args,arg, description){
+		return new this.virtual(arg);
+	}
+
+	static parse(scope, value){
+		return new this.virtual(new Options({
+			source:value,
+			scope
+		}))
+	}
+
 
 	toJSON(){
 		if(this.source.toJSON){
@@ -137,11 +148,11 @@ module.exports = class Handler {
 	static cast(arg){
 		return false
 	}
-
+/*
 	static build(scope,arg){
 		return new this(scope,arg);
 	}
-
+/**/
 	static rootBuild(scope, arg){
 		if(typeof(arg) == "object" && arg.type == "functionCall"){
 			var statment = Statment.build(scope, arg);
@@ -174,3 +185,4 @@ module.exports = class Handler {
 	}
 }
 
+module.exports = Handler;

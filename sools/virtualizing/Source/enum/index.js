@@ -5,5 +5,8 @@ module.exports = {
 	functionArg:require("./FunctionArg"),
 	property:require("./Property"),
 	values:require("./Values"),
-	assignment:require("./Assignment")
+	assignment:require("./Assignment"),
+	function:require("./Function"),
+	method:require("./Method"),
+	dynamicFunction:require("./DynamicFunction")
 }

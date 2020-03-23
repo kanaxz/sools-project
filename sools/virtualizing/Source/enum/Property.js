@@ -14,7 +14,8 @@ module.exports = class Property extends Source {
 				return sourceJSON + "." +  this.path;
 			return {
 				source:sourceJSON,
-				path:this.path
+				path:this.path,
+				...super.toJSON()
 			}
 		}
 		else

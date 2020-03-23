@@ -3,6 +3,8 @@ const Number = require("./Number");
 const Handler = require("../../Handler");
 const Source = require("../../Source")
 const Property = require("../../Source/enum/Property")
+const Reference = require("../../Handler/Reference")
+const Virtual = require("../index")
 
 module.exports = Virtualizing.defineType({
 	name:'dynamicObject',
@@ -20,7 +22,11 @@ module.exports = Virtualizing.defineType({
 			super({scope,source,virtual:options.virtual});
 			if(hold){
 				for(var p in hold){
-					this.virtual[p] = scope.parse(hold[p]);
+					var value = hold[p]
+					if(!(value instanceof Virtual))
+						value = scope.parse([value]);
+					this.virtual[p] = value
+					this.ref.refs[p] = this.virtual[p]._handler.ref
 				}
 			}
 			this.isResult = isResult;

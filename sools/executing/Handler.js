@@ -3,12 +3,12 @@ module.exports = class Handler {
 
 	}
 
-	canProcessFunctionCall(){
-		return false;
+	processFunctionCall(){
+		return;
 	}
 
-	canProcessArg(){
-		return  false;
+	processArg(){
+		return;
 	}
 
 	setup(source){

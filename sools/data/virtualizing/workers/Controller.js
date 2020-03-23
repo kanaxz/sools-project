@@ -3,7 +3,7 @@ const Worker = require(path + "/Worker")
 const HandlerOptions = require(path + "/Handler/Options")
 const flag = Symbol('controlFlag');
 const Reference = require(path+"/Handler/Reference")
-const Virtual = require("../Virtual/enum")
+const Virtuals = require("../Virtual/enum")
 function checkFlag(scope){
 	if(typeof(scope[flag]) == "boolean")
 		return scope[flag]
@@ -38,7 +38,12 @@ module.exports = class Controller extends Worker{
 		}
 	}
 
+	onFunctionCalled(scope, fn, args){
+		
+	}
+
 	onCallingFunction(scope,fn,args){
+		return
 		if([Virtuals.model.methods.load,Virtuals.hasMany.methods.load].indexOf(fn) != -1){
 			if(checkFlag(scope))
 				return

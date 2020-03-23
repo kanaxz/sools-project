@@ -5,5 +5,6 @@ module.exports = {
 	error:require("./Error"),
 	number:require("./Error"),
 	object:require("./Object"),
-	string:require("./String")
+	string:require("./String"),
+	function:require("./Function")
 }

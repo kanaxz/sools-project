@@ -1,7 +1,7 @@
 const stringUtils = require("../../string/utils")
-const Statment = require("../Statment");
+
 const Property = require("../Source/enum/Property")
-const Method = require("../Function/Method")
+const Method = require("../Source/enum/Method")
 const HandlerOptions = require("../Handler/Options")
 
 
@@ -22,6 +22,7 @@ class Virtual{
 		})
 	}
 
+	
 	static registerMethods(methods){
 		this.methods = {...this.methods}
 		if(!methods)
@@ -40,7 +41,8 @@ class Virtual{
 			}
 
 			method = new Method({
-				...methods[methodName],
+				...method,
+				args:typeof(method.args) == "function" ? method.args(this) : method.args
 				name:methodName,
 				type:this
 			})
@@ -75,6 +77,8 @@ class Virtual{
 	toJSON(){
 		return this._handler.toJSON()
 	}
+
+	
 };
 
 module.exports = Virtual;

@@ -1,25 +1,27 @@
 const Virtual = require("./Virtual")
-const Statment = require("./Statment")
+const Statement = require("./Statement")
 const Handler = require("./Handler")
 const HandlerOptions = require("./Handler/Options")
-const Functions = require("./Function/enum");
+const Functions = require("./functions");
+const FunctionCall = require("./Source/enum/FunctionCall")
+const Function = require("./Virtual/enum/Function")
 
 var types = [
-	require("./Virtual/enum/Array"),
+	require("./Virtual/enum/Function"),
 	require("./Virtual/enum/DynamicObject"),
+	require("./Virtual/enum/Array"),
 	require("./Virtual/enum/Number"),
 	require("./Virtual/enum/Boolean"),
 	require("./Virtual/enum/String")
 ]
-
 
 var id = 0;
 class Scope{
 	constructor(env){
 		this.id = id++;
 		this._env = env;
-		this.statments = [];
-		this.removedStatments = [];
+		this.statements = [];
+		this.removedStatements = [];
 		this.vars = [];
 		this.$ = new Proxy(()=>{},{
 			get:(obj,property)=>{
@@ -34,19 +36,17 @@ class Scope{
 						return fn.call(this,args);
 					};
 				}
+			},
+			apply:(obj,self,args)=>{
+				return this.parse(args);
 			}
 		})
 	}
 
-	parse(arg){
-		if(arg instanceof Virtual)
-			return arg;
+	parse(args){
 		for(var type of types){
-			if(type.handler.cast(arg)){
-				return new type(new HandlerOptions({
-					source:arg,
-					scope:this.target
-				}))
+			if(type.handler.cast(...args)){
+				return type.handler.parse(this, ...args)
 			}
 		}
 	}
@@ -67,23 +67,23 @@ class Scope{
 	}
 
 	process(fn,...args){
-		var result = fn(...args,this.$);
+		if(typeof(fn) != "function")
+			debugger
+		var result = fn(...args,this.$);		
 		if(result != null){
-			this.statments.push(this.statment({
-				type:"return",
-				args:[this.processArg(this.parse(result))]
-			}))
-			/**/
+			if(!(result instanceof Virtual))
+				result = this.parse([result])
+			Functions.return.call(this,[this.processArg(result)])
 		}
 		if(this.parent)
 			this.parent._child = null;
 		
-		this.args = args;
+		this.args = args.map((arg)=>(arg && arg._handler) || arg);
 		return this;
 	}
 
 	get lastStatment(){
-		return  this.statments[this.statments.length - 1];
+		return  this.statements[this.statements.length - 1];
 	}
 
 	processArg(arg){
@@ -93,17 +93,16 @@ class Scope{
 		else if(arg instanceof Handler){
 			return arg.process(this);
 		}
-		else if(arg instanceof Array){
-			for(var o of arg)
-				this.processArg(o);
-		}
 		else if(arg instanceof Scope){
 			
 		}
+		
 		else if(typeof(arg) == "object"){
+			debugger
 			for(var p in arg)
 				this.processArg(arg[p])
 		}
+		/**/
 		return arg;
 	}
 
@@ -118,9 +117,9 @@ class Scope{
 	toJSON(){
 		return {
 			argNames:this.args && this.args.filter((arg)=>arg).map((arg)=>{
-				return arg && arg._handler.source.name
+				return arg && arg.source.name
 			}),
-			statments:this.statments.map((s)=>s.toJSON())
+			statements:this.statements.map((s)=>s.toJSON())
 		}
 	}
 
@@ -135,6 +134,6 @@ class Scope{
 
 }
 
-Statment.scope = Scope
+Statement.scope = Scope
 
 module.exports =  Scope;

@@ -1,8 +1,5 @@
 const Virtual =  require("./Virtual")
 const Handler = require("./Handler")
-const Function = require("./Function");
-
-
 
 var Virtualizing = {
 	defineType:(typeDescription)=>{
@@ -32,12 +29,6 @@ var Virtualizing = {
 		proxy.target = type;
 		proxy.handler.virtual = proxy;
 		return  proxy
-	},
-	defineFunction:(name,fnDescription)=>{
-		return new Function({
-			name,
-			...fnDescription
-		})
 	}
 }
 

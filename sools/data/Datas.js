@@ -6,12 +6,12 @@ const Model = require("./Model")
 const HandlerOptions = require("../virtualizing/Handler/Options")
 const Scope = require("../processing/Scope")
 const Context = require("./Context");
-const ModelHandler = require("./executing/Model")
 const Virtuals = require("./virtualizing/Virtual/enum/")
 
 module.exports = class Datas extends Flow {
     constructor(options) {
         super();
+        this.init = options.init;
         this.models = options.models;
         this.source = options.source;
         this.executor = options.executor;
@@ -56,7 +56,11 @@ module.exports = class Datas extends Flow {
 
     async execute(arg1,arg2){
         if(arg1 instanceof Context.type){
-            var vscope = this.env.process(arg2)
+            var vscope = this.env.process((datas, context, $)=>{
+                this.init(datas, context,$)
+                return arg2(datas,context,$)
+            })
+            
             console.log(JSON.stringify(vscope,null," "));
             var scope = new Scope();
             scope.context = arg1

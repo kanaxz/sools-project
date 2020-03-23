@@ -1,6 +1,7 @@
 const Scope = require("./Scope");
 const Virtual =  require("./Virtual")
-require("./Function/enum");
+require("./functions");
+
 class Env{
 	constructor(options){
 		this.workers = options.workers;

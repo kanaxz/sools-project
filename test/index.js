@@ -2,7 +2,9 @@ const Scope = require("sools/processing/Scope");
 const Flow = require("sools/processing/Flow");
 const models = require("./models");
 const datas  = require("./datas");
+const Function = require("sools/virtualizing/Virtual/enum/Function")
 
+global.DEBUG = true
 class EntryPoint extends Flow {
   async setup(scope){
     await super.setup(scope, ()=>{});
@@ -20,23 +22,26 @@ async function work() {
 
 	try{ 
 		await entryPoint.setup(new Scope());
-    debugger
-    var user = new models.user.type({
-      id:'5e2f3e7b3909c23d74f71236'
-    })
     var context = new datas.context.type({
-      user
+      user:{
+       id:'5e2f3e7b3909c23d74f71236',
+      }
     })
-    user.attach(datas);
+    
     
     var users = await datas.execute(context,(datas, context,$) => {
-      var firstGroup = datas.groups.atIndex(0)
     	return datas.users
-        .filter((user,$)=>{
-          return user.memberships.find((mb)=>{
-            return mb.group.eq(firstGroup)
-          })
-        })
+        //.filter((user)=>user.name.eq("Paul"))
+
+        .map((user)=>({
+          user,
+          memberships:user.memberships
+        }))
+        /**/
+      return {
+        firstGroup,
+        users,
+      }
         /*
         .map((user)=>({
           user,
@@ -66,19 +71,3 @@ async function work() {
 
 work();
 /**/
-
-
-async function test(){
-  var index= 0;
-  async function check(){
-    return new Promise((resolve)=>{
-      setTimeout(()=>{
-        resolve((index++) < 3)
-      },1000)
-    })
-  }
-
-  while(await check()){
-    console.log(index)
-  }
-}

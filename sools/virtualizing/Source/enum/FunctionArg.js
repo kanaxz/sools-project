@@ -1,8 +1,8 @@
 const Var = require("./Var");
 
 module.exports = class FunctionArg extends Var {
-	constructor(name, functionCall){
+	constructor(name, fn){
 		super(name);
-		this.functionCall = functionCall;
+		this.function = fn;
 	}
 }

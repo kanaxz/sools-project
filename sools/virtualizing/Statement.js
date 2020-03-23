@@ -1,25 +1,11 @@
 var id = 0;
 module.exports = class Statment{
-	constructor(values){
-		this._id = id++;
-		for(var p in values){
-			this[p] = values[p];
-		}
-		if(this.args)
-			this.setArgs(this.args);
-	}
-
-	setArgs(args){
-		this.args = args.map((arg)=>arg._handler || arg)
+	constructor(functionCall){
+		this.functionCall = functionCall
 	}
 
 	toJSON(){
-		return {
-			type:this.type,
-			function:this.function && this.function.toJSON(),
-			args:this.args.map((arg)=>{
-				return arg.toJSON && arg.toJSON() || arg
-			})};
+		return this.functionCall.toJSON();
 	}
 
 	static build(scope,statment){

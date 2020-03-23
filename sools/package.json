@@ -9,7 +9,7 @@
     "author": "",
     "license": "ISC",
     "scripts": {
-        "test-debug": "nodemon --exec \"mocha --inspect-brk $(find ./test -name '*.test.js')\"",
+        "test-debug": "nodemon --exec \"mocha --inspect-brk $(find ./**/test -name '*.test.js')\"",
         "test": "mocha  $(find ./**/test -name '*.js')",
         "mocha": "mocha"
     },

@@ -18,7 +18,6 @@ module.exports = Virtualizing.defineType({
 	},
 	methods:{
 		indexOf:false,
-		forEach:false,
 		remove:{
 
 		},

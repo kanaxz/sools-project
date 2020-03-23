@@ -1,8 +1,8 @@
 const Virtualizing = require("../../index")
 const Number = require("./Number");
 const Handler = require("../../Handler");
-const Scope = require("../../Scope")
 const utils = require("../../utils")
+const Function = require("./Function");
 
 module.exports = Virtualizing.defineType({
 	name:'array',
@@ -10,11 +10,9 @@ module.exports = Virtualizing.defineType({
 		constructor(options){						
 			super(options);
 			this.type = options.type;
-			if(!this.type){
-				debugger
-			}
-			else if(this.type._handler)
+			if(this.type._handler)
 				this.type = this.type._handler
+			
 		}
 
 		clone(options){
@@ -43,7 +41,6 @@ module.exports = Virtualizing.defineType({
 				var done = -1;
 				return {
 					next:()=>{
-						debugger
 						done++;
 						if(done == 0)
 							scope.parent._child = null;
@@ -61,7 +58,8 @@ module.exports = Virtualizing.defineType({
 	},
 	methods:((Array)=>{
 		var fnArg = {
-			type:'function',
+			type:Function,
+			required:true,
 			args:(scope, args,argNames)=>([
 				args[0].type.clone({scope,source:argNames[0]})
 			])
@@ -69,7 +67,7 @@ module.exports = Virtualizing.defineType({
 		return {
 			atIndex:{
 				return:(functionCall)=>{
-					return  functionCall.statment.args[0].type.clone({
+					return functionCall.statment.args[0].type.clone({
 						source:functionCall
 					})
 				},
@@ -80,7 +78,7 @@ module.exports = Virtualizing.defineType({
 			},
 			filter:{
 				return:(functionCall)=>{
-					var array = functionCall.statment.args[0];
+					var array = functionCall.args[0];
 					return array.clone({
 						source:functionCall
 					})
@@ -92,7 +90,7 @@ module.exports = Virtualizing.defineType({
 			},
 			find:{
 				return:(functionCall)=>{
-					return  functionCall.statment.args[0].type.clone({
+					return  functionCall.args[0].type.clone({
 						source:functionCall
 					})
 				},
@@ -102,6 +100,12 @@ module.exports = Virtualizing.defineType({
 				]
 			},
 			forEach:{
+				return:(functionCall)=>{
+					var array = functionCall.args[0];
+					return array.clone({
+						source:functionCall
+					})
+				},
 				args:[
 					Array,
 					fnArg
@@ -109,8 +113,8 @@ module.exports = Virtualizing.defineType({
 			},
 			map:{
 				return:(functionCall)=>{
-					var rtrn = functionCall.statment.args[1].statments.find((statment)=>statment.type  == 'return').args[0];
-					var array = functionCall.statment.args[0];
+					var rtrn = functionCall.args[1].source.scope.statements.find((statment)=>statment.functionCall.function.source.name  == 'return').functionCall.args[0];
+					var array = functionCall.args[0];
 					return array.clone({
 						source:functionCall,
 						type:rtrn

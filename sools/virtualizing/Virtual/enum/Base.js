@@ -1,7 +1,6 @@
 const Virtualizing = require("../../index");
 const HandlerOptions = require("../../Handler/Options")
-debugger
-console.log(Virtualizing)
+
 module.exports = Virtualizing.defineType({
 	name:'base',
 	methods:(Base)=>{
