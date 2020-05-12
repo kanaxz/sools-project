@@ -1,7 +1,5 @@
 const path = require('path');
-var HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
-var CommonsPlugin = new require("webpack/lib/optimize/CommonsChunkPlugin")
 
 module.exports = {
     entry: "./client/entryPoint",

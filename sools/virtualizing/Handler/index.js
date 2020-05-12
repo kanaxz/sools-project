@@ -1,9 +1,9 @@
 const utils = require("../utils")
 const Options = require("./Options")
 const Reference = require("./Reference");
-const Statement = require("../Statement");
-const Sources = require("../Source/enum/")
-const Assignment = require("../functions/Assignment")
+const Property = require("../Source/enum/Property")
+const Var = require("../Source/enum/Var")
+//const Virtual = require("../Virtual")
 
 var id = 0;
 class Handler {
@@ -11,6 +11,8 @@ class Handler {
 		var source = options.source;
 		this.id  = id++
 		this.virtual = options.virtual;
+		if(!this.virtual)
+			debugger
 		this.typeName = this.virtual.constructor.typeName;
 		/*
 		if(source && source.path)
@@ -20,23 +22,34 @@ class Handler {
 		this.ref.type = this.virtual.constructor;
 		if(source == null)
 			return
-
+		
 		if(this.typeName != "string" && typeof(source) == "string"){
-			source = new Sources.var(source);
+			source = new Var(source);
 		}
+		/**/
 
 		var scope = options.scope
 		if(!scope)
 			scope = source.scope;
-		if(source instanceof Sources.var){
-			if(!scope.vars)
+		if(source instanceof Var){
+			if(!scope.vars){
 				debugger
+				throw new Error("Scope not found")
+			}
 			scope.vars.push(this);
 		}
 		this.scope = scope;
 		this.source = source;
 		
 	}	
+
+	get template(){
+		return this.constructor.template;	
+	}
+
+	static get template(){
+		return this.virtual.template
+	}
 
 	clone(options){
 		options = options || {}
@@ -55,52 +68,16 @@ class Handler {
 		return new (this.cloneConstructor())(options);
 	}
 
-	processSource(arg){
-		if(arg.source instanceof Sources.functionCall){	
-			if(arg.scope == arg.scope.target && arg.source == arg.scope.lastStatment.functionCall){
-				arg.scope.statements.splice(-1,1)
-				arg.scope.removedStatements.push({
-					index:arg.scope.statements.length,
-					statement:arg.source.statement
-				})	
-			}		
-			else{
-				var removedStatement = arg.scope.removedStatements.find((rs)=>rs.statement.functionCall == arg.source);
-				if(removedStatmentIndex){
-					var index = arg.scope.removedStatements.indexOf(removedStatement);
-					arg.scope.statements.splice(index,0,removedStatement.statement);
-					arg.scope.removedStatements.splice(index,1)
-				}
-				var variable = this.clone({
-					source:utils.gererateVariableId(),
-					scope:arg.scope
-				});
-				var index = arg.scope.statements.indexOf(arg.source.statment);
-				if(index == -1)
-					throw new Error()
-				arg.scope.statements.splice(index,1,new Statment(new Sources.functionCall({
-					scope:arg.scope,
-					function:Assignment,
-					args:[this.clone({scope:arg.scope,source: arg.source}),variable]
-				})));
-				arg.source = variable._handler.source;
-			}
-		}		
-		return this;	
-	}
-
-	process(){
-		return this.processSource(this);
-	}
-
 	cloneConstructor(){
 		return this.constructor.virtual;
 	}
 
+	setProperty(property,value){
+		Handler.set.call(this.scope,[this,property.name,value])
+	}
+
 	getProperty(property){
-
-
-		var source = new Sources.property({
+		var source = new Property({
 			source:this,
 			path:property.name
 		});
@@ -125,7 +102,8 @@ class Handler {
 	}
 
 	static buildArg(scope,args,arg, description){
-		return new this.virtual(arg);
+		return scope.parse([arg])
+		//return new this.virtual(arg);
 	}
 
 	static parse(scope, value){
@@ -153,36 +131,11 @@ class Handler {
 		return new this(scope,arg);
 	}
 /**/
-	static rootBuild(scope, arg){
-		if(typeof(arg) == "object" && arg.type == "functionCall"){
-			var statment = Statment.build(scope, arg);
-			var split = arg.function.split(".");
-			var method = scope.env.description.types[split[0]].methods[split[1]];
-			return method.return(statment);
-		}
-		else if(typeof(arg) == "string" && arg[0] == "$"){
-			var split = arg.split(".");
-			var result = scope.getVar(split[0].replace("$",""));
-			split.shift();
-			for(var segment of split){
-				result = result[segment]
-			}
-			return result;
-		}
-		else if(typeof(arg) == "object" && arg.source && arg.path){
 
-		}
-		else {
-			var types = scope.env.description.types;
-			for(var typeName in types){
-				var type = types[typeName];
-				if(type.class.cast(arg)){
-					return type.class.build(scope,arg);
-				}
-			}			
-		}
-		return arg;
-	}
 }
 
+
+
+
+/**/
 module.exports = Handler;

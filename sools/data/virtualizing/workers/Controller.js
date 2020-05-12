@@ -4,6 +4,12 @@ const HandlerOptions = require(path + "/Handler/Options")
 const flag = Symbol('controlFlag');
 const Reference = require(path+"/Handler/Reference")
 const Virtuals = require("../Virtual/enum")
+const Function = require("../../../virtualizing/Virtual/enum/Function")
+const DynamicFunction = require("../../../virtualizing/Source/enum/DynamicFunction")
+const Array = require("../../../virtualizing/Virtual/enum/Array")
+const FunctionCall = require("../../../virtualizing/Source/enum/FunctionCall")
+const Functions = require("../../../virtualizing/functions")
+
 function checkFlag(scope){
 	if(typeof(scope[flag]) == "boolean")
 		return scope[flag]
@@ -19,72 +25,73 @@ module.exports = class Controller extends Worker{
 		this.controls = controls;
 	}
 
-	onPropertyGet(property, datas, collection){
-		if(datas instanceof Virtuals.datas){
-			var control = this.controls[property.model.name]
+	onFunctionCalled(scope, functionCall, result){
+
+		if(functionCall.function == Virtuals.collection.methods.get){
+			var control = this.controls[functionCall.args[0].model.typeName]
 			if(control && control.get){
-				var scope = datas._handler.scope;
 				if(checkFlag(scope))
 					return
+
 				scope[flag] = true;
 				var context = scope.$.context;
-				var saveRef = collection._handler.type.ref
-				collection._handler.type.ref = new Reference();
-				var result = control.get(context, collection,(models)=>models,scope.$);
-				collection._handler = result._handler
-				collection._handler.type.ref = saveRef;
+				result = control.get(context, result,(models)=>models,scope.$);
+				result.forEach((model)=>{
+					model.unload({})
+				})
 				scope[flag] = false;
+				return result;
 			}
-		}
-	}
-
-	onFunctionCalled(scope, fn, args){
 		
-	}
-
-	onCallingFunction(scope,fn,args){
-		return
-		if([Virtuals.model.methods.load,Virtuals.hasMany.methods.load].indexOf(fn) != -1){
+		}
+		else if([Virtuals.model.methods.load,Virtuals.hasMany.methods.load].indexOf(functionCall.function) != -1){
+			var fn = functionCall.function;
 			if(checkFlag(scope))
 				return
-			scope[flag] = true;
-			var modelHandler;
-			if(fn == Model.methods.load){
-				modelHandler = args[0]._handler;
-			}
-			else{
-				modelHandler = args[0]._handler.type;
-			}
 			
-			if(!this.controls[modelHandler.typeName])
+			var type = functionCall.args[0];
+			if(type.typeName == "hasMany")
+				type = type.type;
+			if(!this.controls[type.typeName])
 				return
 			
-			var control = this.controls[modelHandler.typeName].get
+			var control = this.controls[type.typeName].get
 			if(!control)
 				return
-			var fn = args[1];
-			args[1] = (models,$)=>{
-				var subScope = $._private
-				var originalType = models._handler.type;
-				var controlType = models._handler.type.clone({
-					ref:new Reference()
+
+			functionCall.args[1] = new Function(new HandlerOptions({
+				source:new DynamicFunction({
+					scope:functionCall.scope,
+					args:[new Array(new HandlerOptions({
+						type
+					}))._handler],
+					fn:(models, $)=>{
+						var scope = $._private;
+						scope[flag] = true;
+						return control($.context,models,(models)=>{
+							models.forEach((model)=>{
+								model.unload({})
+							})
+							if(functionCall.args[1]){
+								scope.processArg(models)
+								scope.statements.push(new FunctionCall({
+									function:Functions.return,
+									args:[models._handler.clone({
+										scope,
+										source:new FunctionCall({
+											args:[models],
+											function:functionCall.args[1].source
+										})
+									})]
+								}))
+							}
+							else
+								return models;
+						})
+					}
 				})
-				models = models._handler.clone({
-					type:controlType
-				})
-				return control($.context, models,(models)=>{
-					subScope[flag] = false;
-					models = models._handler.clone({
-						type:originalType
-					})
-					var result = (fn && fn(models,$) || models)._handler.clone({
-						type:controlType
-					})
-					subScope[flag] = true;
-					return result;
-				},$)
-			}
+			}))._handler
 		}
-		
+		/**/
 	}
 }

@@ -18,6 +18,15 @@ var functions = {
 			}))
 		},
 	}),
+	log:new Function({
+		name:'log',
+		return:(functionCall)=>{
+			return functionCall.args[0].clone({
+				source:functionCall
+			})
+		},
+		args:[Virtual]
+	}),
 	if:new Function({
 		name:'if',
 		args:[Virtual,VirtualFunction]
@@ -34,19 +43,17 @@ var functions = {
 		name:'delete',
 		args:[Virtual]
 	}),
-	assignment:require("./Assignment"),
-	return:new Function({
-		name:'return',
-		args:[Virtual]
-	}),
+	assign:require("./Set"),
+	return:require("./Return"),
+	return:require("./Declare"),
 	instanceof:new Function({
 		name:'instanceof',
 		args:[Virtual,Virtual]
 	}),
-	findByUpperCase:(name)=>{
-		for(var fn in functions)
+	findByUpperCase(name){
+		for(var fn in this)
 			if(fn.toUpperCase() == name)
-				return functions[fn];
+				return this[fn];
 	}
 }
 

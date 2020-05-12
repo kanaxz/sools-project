@@ -1,6 +1,6 @@
 module.exports = {
 	user:{
-		get:(context,users,next,$)=>{
+		get:(context,users,next)=>{
 			return next(users.filter((user)=>{
 				IF(user.eq(context.user),()=>{
 					return true
@@ -11,6 +11,33 @@ module.exports = {
 					})
 				})
 			}))
+		},
+		add:(contet, users)=>{
+			var adminGroup = context.user.memberships.find((group)=>{
+				return group.name.eq("admin")
+			})
+			IF(adminGroup.eq(null),()=>{
+				THROW(new Error())
+			})
+		},
+		update:(context,users,next)=>{
+			return next(users.filter((user)=>{
+				var isAdmin = context.user.memberships.find((mb)=>{
+					return mb.group.name.eq("admin")
+				})
+				return OR(isAdmin,user.eq(context.user))
+			}).forEach((user)=>{
+				user.load({
+					memberships:{
+						group:true
+					}
+				})
+			}),(user,save)=>{
+				IF(NOT(user.eq(context.user)),()=>{
+					delete user.password	
+				})	
+				save()
+			})
 		}
 	},
 	group:(()=>{
@@ -29,11 +56,13 @@ module.exports = {
 						group.owner = context.user
 					}));
 				},
-				update:(context,groups,next,$)=>{
-					return next(groups.forEach((group)=>{
-						check(context,group,$);
-						delete group.owner
-					}));
+				update:{
+					filter:(context,users,next)=>{
+
+					},
+					validate:(context,user,next)=>{
+
+					}
 				},
 				remove:(context,groups,next,$)=>{
 					return next(groups.forEach((group)=>{

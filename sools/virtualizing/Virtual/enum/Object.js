@@ -28,11 +28,11 @@ module.exports = Virtualizing.defineType({
 					}
 				})
 				options = options || new HandlerOptions();
-				if(hasValues)
+				if(hasValues){
 					options.source = new Values(isPushed ? null :values);
+				}
 				super(options);
 				if(isPushed){
-					debugger
 					var index = 0;
 					for(var propertyName in this.constructor.properties){
 						options.source[propertyName] = values[index++]

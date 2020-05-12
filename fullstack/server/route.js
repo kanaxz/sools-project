@@ -1,29 +1,32 @@
 const sools = require("sools");
 const datas = require("./datas");
-const Builder = require("sools-process/Builder");
 const Route = require("sools-express/Route");
 const Request = require("sools-express/Request");
-const Query = require("sools-data/Query");
 const Response = require("sools-express/Response");
 const express = require("./express");
-var route = new Route(express, "/datas")
-    .then(new Builder({
-        source: (scope) => {
-            var datas = scope.components.get(Request).body;
-            return datas.queries
-        },
-        type: Query,
-        isArray: true
-    }))
-    .then(datas)
-    .then(new Response({
-        source: (scope) => {
-            var queries = scope.components.getAll(Query);
+const Context = require("sools/data/Context").type;
 
-            var results = queries.map((query) => {
-                return query.resultToJSON();
-            })
-            return results
-        }
+
+var route = new Route(express, "/datas")
+		.then({
+			datas:null,
+			setup(scope, next){
+				this.datas = scope.datas
+				this.datas.context.registerProperties({
+					user:models.user
+				})
+				return next();
+			},
+			execute(scope, next){
+				scope.context = new Context({
+					user:scope.req.user
+				})
+				scope.scope = this.datas.build(scope.req.body);
+				return next();
+			}
+		})
+    .then(datas)
+    .then(new Response((scope) => {
+        return results
     }))
 module.exports = route;

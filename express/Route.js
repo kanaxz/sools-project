@@ -1,6 +1,5 @@
-var Flow = require('sools-process/Flow');
-var Scope = require('sools-process/Scope');
-var Trigger = require("sools-process/Trigger")
+var Scope = require('sools/processing/Scope');
+var Trigger = require("sools/processing/Trigger")
 var Request = require('./Request')
 class Route extends Trigger {
 	constructor(router, url){
@@ -18,9 +17,9 @@ class Route extends Trigger {
 	}
 	
 	callback(req, res){
-		var request = new Request(req, res);
 		var scope = new Scope();
-		scope.push(request);
+		scope.req = req;
+		scope.res = res;
 		this.execute(scope)
 	}
 }

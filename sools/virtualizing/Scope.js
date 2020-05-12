@@ -1,21 +1,51 @@
 const Virtual = require("./Virtual")
-const Statement = require("./Statement")
 const Handler = require("./Handler")
 const HandlerOptions = require("./Handler/Options")
-const Functions = require("./functions");
 const FunctionCall = require("./Source/enum/FunctionCall")
-const Function = require("./Virtual/enum/Function")
-
-var types = [
-	require("./Virtual/enum/Function"),
-	require("./Virtual/enum/DynamicObject"),
-	require("./Virtual/enum/Array"),
-	require("./Virtual/enum/Number"),
-	require("./Virtual/enum/Boolean"),
-	require("./Virtual/enum/String")
-]
-
+const Return = require("./functions/Return")
+const Declare = require("./functions/Declare")
+const utils = require("./utils")
+const String = require("./Virtual/enum/String")
 var id = 0;
+
+function processSource(arg){
+	if(arg.source instanceof FunctionCall){	
+		if(arg.scope == arg.scope.target && arg.source == arg.scope.lastStatment){
+			arg.scope.statements.splice(-1,1)
+			arg.scope.removedStatements.push({
+				index:arg.scope.statements.length,
+				functionCall:arg.source
+			})	
+		}		
+		else{
+			var removedStatement = arg.scope.removedStatements.find((rs)=>rs.functionCall == arg.source);
+			if(removedStatement){
+				var index = arg.scope.removedStatements.indexOf(removedStatement);
+				arg.scope.statements.splice(removedStatement.index,0,removedStatement.functionCall);
+				arg.scope.removedStatements.splice(index,1)
+			}
+			var id= utils.gererateVariableId()
+			var variable = arg.clone({
+				source:id,
+				scope:arg.scope
+			});
+			var index = arg.scope.statements.indexOf(arg.source);
+			if(index == -1){
+				debugger
+				throw new Error("Could not found statment")
+			}
+			arg.scope.statements.splice(index,1,new FunctionCall({
+				scope:arg.scope,
+				function:Declare,
+				args:[variable,arg.clone({scope:arg.scope,source: arg.source})]
+			}));
+			arg.source = variable._handler.source;
+		}
+	}		
+	return arg;	
+}
+
+
 class Scope{
 	constructor(env){
 		this.id = id++;
@@ -30,10 +60,10 @@ class Scope{
 				var theVar = this.getVar(property);
 				if(theVar)
 					return theVar.virtual
-				var fn = Functions.findByUpperCase(property);
+				var fn = this.env.functions.findByUpperCase(property);
 				if(fn){
 					return (...args)=>{
-						return fn.call(this,args);
+						return fn.call(this.target,args);
 					};
 				}
 			},
@@ -44,7 +74,9 @@ class Scope{
 	}
 
 	parse(args){
-		for(var type of types){
+		for(var typeName in this.env.types){
+
+			var type = this.env.types[typeName]			
 			if(type.handler.cast(...args)){
 				return type.handler.parse(this, ...args)
 			}
@@ -73,7 +105,7 @@ class Scope{
 		if(result != null){
 			if(!(result instanceof Virtual))
 				result = this.parse([result])
-			Functions.return.call(this,[this.processArg(result)])
+			Return.call(this,[result])
 		}
 		if(this.parent)
 			this.parent._child = null;
@@ -88,10 +120,10 @@ class Scope{
 
 	processArg(arg){
 		if(arg instanceof Virtual){
-			return arg._handler.process(this);
+			return processSource(arg._handler)
 		}
 		else if(arg instanceof Handler){
-			return arg.process(this);
+			return processSource(arg)
 		}
 		else if(arg instanceof Scope){
 			
@@ -107,7 +139,11 @@ class Scope{
 	}
 
 	getVar(name){
-		var result = this.vars.find((v)=>v.source.name == name);
+		var result = this.vars.find((v)=>{
+			if(!v.source)
+				debugger
+			return v.source.name == name
+		});
 		if(result)
 			return result
 		return this.parent && this.parent.getVar(name) || null
@@ -122,18 +158,6 @@ class Scope{
 			statements:this.statements.map((s)=>s.toJSON())
 		}
 	}
-
-	static build(scope, object){
-		var scope = scope.child();
-		scope.argNames = object.argNames;
-		for(var statment of object.statments){
-			scope.statments.push(Statment.build(scope,statment))
-		}
-		return scope;
-	}
-
 }
-
-Statement.scope = Scope
 
 module.exports =  Scope;

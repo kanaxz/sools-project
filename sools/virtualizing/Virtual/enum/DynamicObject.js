@@ -40,13 +40,14 @@ module.exports = Virtualizing.defineType({
 		}
 
 		clone(options){
+			debugger
 			options = options || {};
 			var clone = super.clone(options);
 			for(var p in this.virtual){
 				clone[p] = this.virtual[p]._handler.clone({
 					scope:options.scope,
 					source: new Property({
-						source:clone,
+						source:clone._handler,
 						path:p
 					})
 				});

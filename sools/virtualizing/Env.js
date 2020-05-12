@@ -1,11 +1,15 @@
 const Scope = require("./Scope");
 const Virtual =  require("./Virtual")
-require("./functions");
+const Functions = require("./functions");
+const Virtuals = require("./Virtual/")
+const Builder = require("./Builder")
 
 class Env{
 	constructor(options){
 		this.workers = options.workers;
 		this.initFn = options.initFn;
+		this.types = options.types,
+		this.functions = {...Functions,...(options.functions || {})}
 	}
 
 	process(fn){
@@ -16,10 +20,10 @@ class Env{
 		return scope;
 	}	
 
-	build(object){
-		var rootScope = new Scope(this);
-		rootScope.process(this.initFn);
-		return Scope.build(rootScope,object)
+	build(scope, json){
+		for(var statement of json.statements){
+			Builder.functionCall(scope, statement);
+		}
 	}
 }
 

@@ -7,12 +7,12 @@ module.exports = class Handler {
 		return;
 	}
 
-	processArg(){
-		return;
-	}
-
 	setup(source){
 		this.source = source;
+	}
+
+	init(){
+		
 	}
 
 	stop(){

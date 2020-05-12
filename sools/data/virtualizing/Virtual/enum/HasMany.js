@@ -3,11 +3,13 @@ const Array = require("../../../../virtualizing/Virtual/enum/Array")
 const Function = require("../../../../virtualizing/Virtual/enum/Function")
 const HandlerOptions = require("../../../../virtualizing/Handler/Options")
 const utils = require("../utils")
+const Model = require("./Model")
+const Reference = require("../../../../virtualizing/Handler/Reference")
 
-
-module.exports = Virtualizing.defineType({
+const HasMany = Virtualizing.defineType({
 	name:'hasMany',
 	extends:Array,
+	template:Model,
 	handler:class HasManyHandler extends Array.handler{
 		constructor(options){
 			super(options);
@@ -16,21 +18,20 @@ module.exports = Virtualizing.defineType({
 		}
 		static callAsProperty(scope, property,ref){
 			return {
-				type:new property.model(new HandlerOptions({
-					ref:ref && ref.refs.type
-				})),
+				ref,
 				property:property
 			};
 		}
 	},
 	methods:(HasMany)=>({
-		include:{
+		unload:{
 			jsCall:(args, call)=>{
-				return utils.include(args, call, true)
+				return utils.unload(args, call, true)
 			},
 			return:(functionCall)=>{
 				var hasMany = functionCall.args[0];
-				hasMany.ref.isIncluded = true;
+				hasMany.ref.isLoaded = false;
+				hasMany.type.ref.isLoaded = false;
 				return hasMany.clone({
 					source:functionCall
 				})
@@ -46,7 +47,7 @@ module.exports = Virtualizing.defineType({
 			return:(functionCall)=>{
 				var hasMany = functionCall.args[0];
 				hasMany.ref.isLoaded = true;
-				//hasMany.type.ref.isLoaded = true;
+				hasMany.ref.refs.template.isLoaded = true;
 				return hasMany.clone({
 					source:functionCall
 				})
@@ -57,10 +58,14 @@ module.exports = Virtualizing.defineType({
 					type:Function,
 					args:(scope, args, argNames)=>{
 						return [
-							new Array(new HandlerOptions({
+							new (Array.of(args[0].template))(new HandlerOptions({
 								scope,
 								source:argNames[0],
-								type:args[0].type.clone()
+								ref:new Reference({
+									refs:{
+										template:args[0].ref.refs.template
+									}
+								})
 							}))
 						]
 					}
@@ -70,3 +75,6 @@ module.exports = Virtualizing.defineType({
 	})
 })
 
+
+utils.hasMany = HasMany;
+module.exports = HasMany

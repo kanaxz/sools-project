@@ -28,8 +28,17 @@ class Flow extends Process {
     }
 
     then(process) {
-        if(!(process instanceof Process))
-            process  = new Dynamic(null, process);
+        if(!(process instanceof Process)){
+            if(typeof(process) == "object"){
+                process = new Dynamic(process);  
+            }
+            else if(typeof(process) == "function"){
+                process = new Dynamic({
+                    execute:process
+                });    
+            }
+            
+        }
         this.process.push(process);
         return (this);
     }

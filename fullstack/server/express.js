@@ -8,8 +8,6 @@ const MongoStore = require('connect-mongo')(session);
 var passport = require("passport");
 var cookieParser = require('cookie-parser');
 var config = require("./config");
-var morgan = require("morgan");
-
 var app = express();
 
 
@@ -19,7 +17,6 @@ app.set('assetsPath', path.join(config.root, 'assets'));
 app.use(express.static(app.get('appPath')));
 //app.use(express.logger('dev')); 
 app.set('view engine', 'html');
-//app.use(morgan('tiny'));
 
 app.use(session({
     secret: 'G854Eaf64EA84gmolq84',

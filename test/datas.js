@@ -11,7 +11,7 @@ const models = require("./models");
 
 var datas = new Datas({
   init:(datas,context)=>{
-    return
+  	return
     context.user.load({
       memberships:{
         group:true
@@ -20,16 +20,15 @@ var datas = new Datas({
   },
   models,
   virtualization:[
-  
-    new AutoLoad(), 
-    /*
-    new Load(),
-    new Controller(controls)
+  	
+  	//new AutoLoad(), 
+  	//new Controller(controls),
+  	new Load(),
     /**/],
 })
 
 datas
-  
+  /**/
   .then(new Memory({
     handlers:[
       new Mongodb({

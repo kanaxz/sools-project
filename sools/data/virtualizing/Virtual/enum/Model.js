@@ -1,4 +1,4 @@
-const Virtualizing = require("../../../../virtualizing")
+const Virtual = require("../../../../virtualizing")
 const Array = require("../../../../virtualizing/Virtual/enum/Array")
 const HandlerOptions = require("../../../../virtualizing/Handler/Options")
 const Boolean = require("../../../../virtualizing/Virtual/enum/Boolean")
@@ -6,7 +6,7 @@ const Object =require("../../../../virtualizing/Virtual/enum/Object")
 const utils = require("../utils")
 const Function = require("../../../../virtualizing/Virtual/enum/Function")
 
-module.exports = Virtualizing.defineType({
+const Model = Virtual.define({
 	name:'model',
 	extends:Object,
 	handler:class ModelHandler extends Object.handler{
@@ -22,13 +22,13 @@ module.exports = Virtualizing.defineType({
 		}
 	},
 	methods:(Model)=>({
-		include:{
+		unload:{
 			jsCall:(args, call)=>{
-				return utils.include(args, call, false)
+				return utils.unload(args, call, false)
 			},
 			return:(functionCall)=>{
 				var model = functionCall.args[0];
-				model.ref.isIncluded = true;
+				model.ref.isLoaded = false;
 				return model.clone({
 					source:functionCall
 				})
@@ -48,16 +48,15 @@ module.exports = Virtualizing.defineType({
 					source:functionCall
 				})
 			},
-			args:(Model)=>[
-				Model,
+			args:(T)=>[
+				T,
 				{
 					type:Function,
 					args:(scope, args, argNames)=>{
 						return [
-							new Array(new HandlerOptions({
+							new (Array.of(args[0].constructor))(new HandlerOptions({
 								scope,
-								source:argNames[0],
-								//type:args[0].clone()
+								source:argNames[0]
 							}))
 						]
 					}
@@ -68,10 +67,14 @@ module.exports = Virtualizing.defineType({
 			return:(functionCall)=>{
 				return new Boolean(new HandlerOptions({source:functionCall}))
 			},
-			args:(Model)=>[
-				Model,
-				Model
+			args:(T)=>[
+				T,
+				T
 			]
 		}
 	})
 })
+
+
+utils.model = Model;
+module.exports = Model

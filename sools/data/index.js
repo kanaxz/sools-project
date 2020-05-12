@@ -12,8 +12,7 @@ var virtualPropertyMapping =  [
     ['number',()=>({type:virtualTypes.number})],
     ['string',()=>({type:virtualTypes.string})],
     ['hasMany',(property)=>({
-        type:virtualTypes.hasMany,
-        model:property.model.virtual,
+        type:virtualTypes.hasMany.of(property.model.virtual),
         load:property.load
     })]
 ]
@@ -104,8 +103,8 @@ var Data = {
         var model = models[modelName];
         var vproperties = {};
         var properties = {}
-        for(var propertyName in model.properties){
-            var property =  model.properties[propertyName];
+        for(let propertyName in model.properties){
+            let property =  model.properties[propertyName];
             if(typeof(property) == "string"){
                 property = {
                     type:property
@@ -115,7 +114,7 @@ var Data = {
               property = {
                 type:'hasMany',
                 model:result[property[0]],
-                load:(model,hasMany)=>{
+                load:(model,hasMany)=>{                  
                   return hasMany.filter((subModel)=>{
                     return subModel[modelName].eq(model)
                   })

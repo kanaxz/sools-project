@@ -2,6 +2,7 @@ module.exports = {
 	array:require("./Array"),
 	boolean:require("./Boolean"),
 	dynamicObject:require("./DynamicObject"),
+	base:require("./Base"),
 	error:require("./Error"),
 	number:require("./Error"),
 	object:require("./Object"),

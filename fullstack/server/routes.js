@@ -3,7 +3,7 @@ var stringUtilities = require("sools/string/utils")
 var app = require("./express");
 
 module.exports = function() {
-    app.use("/apis/auth", require('./components/auth/route'));
+    app.use("/apis/auth", require('./auth/route'));
 
     app.use('/storage/:path', (req, res) => {
         res.sendFile(app.get('storagePath') + '/' + req.params.path);

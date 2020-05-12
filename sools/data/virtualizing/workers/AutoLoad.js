@@ -1,53 +1,61 @@
 const Worker = require("../../../virtualizing/Worker")
 const Virtuals = require("../Virtual/enum")
 const Sources = require("../../../virtualizing/Source/enum")
-const flag = "test";Symbol('autoLoadFlag');
+const flag = Symbol('autoLoadFlag');
 
-function related(child,parent){
-
+function scopeRelated(child, parent){
+	var current = child;
+	while(current){
+		if(current == parent)
+			return true
+		current = current.parent;
+	}
+	return false;
 }
 
 module.exports = class AutoLoad extends Worker{
 	constructor(){
 		super();
-		this.hasManyHold = [];
+		this.holds = [];
 	}
+
 	onPropertyGet(property,owner, virtual){
 
-		if(owner instanceof Virtuals.model){
-			if(virtual instanceof Virtuals.hasMany){
-				if(!virtual._handler.ref.isLoaded){
-					debugger
-					virtual._handler.scope[flag] = virtual
-				}
+		if(virtual instanceof Virtuals.model || virtual instanceof Virtuals.hasMany){
+			if(!virtual._handler.ref.isLoaded){				
+				var existing = this.holds.findIndex((handler)=>handler.ref == virtual._handler.ref)
+				if(existing == -1)
+				this.holds.push(virtual._handler);
 			}
-			/**/
-			if(false && owner._handler.source instanceof Sources.functionArg){
-				
+		}	
+		else if(owner instanceof Virtuals.model){
+			if(property.name == "id"){
+				var index = this.holds.indexOf(owner._handler)
+				if(index != -1)
+					this.holds.splice(index,1)
 			}
-			 if(virtual._handler.source instanceof Sources.property 
-				&& (virtual._handler.source.path == "id" 
-					|| !(virtual._handler.source.source instanceof Virtuals.model))){
-
-			}
-			else if(!owner._handler.ref.isLoaded){
-				owner.load();
-			}
-		}		
+		}	
 	}
 
 	onFunctionCalled(scope, functionCall){
-		debugger
-		if(scope[flag]){
-			if(functionCall.function.source != Virtuals.hasMany.methods.load || functionCall.args[0] != scope[flag]){
-				scope[flag].load();
+		for(var i =0;i<this.holds.length;i++){
+			var hold = this.holds[i]
+			if(scopeRelated(hold.scope, scope)){
+				console.log(functionCall.function.name)
+				this.holds.splice(i--,1)
+				if(!(['load','eq','unload'].indexOf(functionCall.function.name) != -1 && functionCall.args[0].ref == hold.ref)){
+					if(hold.scope == scope){
+						debugger
+						hold.virtual.constructor.methods.load.innerCall(scope,[hold.virtual],(functionCall)=>{
+							scope.statements.splice(scope.statements.length - 1,0,functionCall)
+						})
+					}
+					else{
+						hold.virtual.load();		
+					}
+					
+			 	}
 			}
-		}
-	}
-
-	onCallingFunction(scope,fn, args){
-		if(args[0] instanceof Virtuals.hasMany && fn.name != "load" && !args[0]._handler.ref.isLoaded){
-			args[0].load();
 		}
 	}
 }

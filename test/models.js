@@ -1,4 +1,3 @@
-const Virtualizing = require("sools/virtualizing")
 const Virtual = require("sools/virtualizing/Virtual");
 const Data =  require("sools/data")
 const Model = require("sools/data/Model");
@@ -6,13 +5,13 @@ module.exports = Data.define({
 	user:{
 		extends:Model,
 		properties:{
-			id:'string',
+			_id:'string',
 			name:'string',
 			memberships:['membership']
 		},
 		indexes:[{
 			type:'unique',
-			properties:['id']
+			properties:['_id']
 		},{
 			type:'unique',
 			properties:['name']
@@ -21,13 +20,13 @@ module.exports = Data.define({
 	group:{
 		extends:Model,
 		properties:{
-			id:'string',
+			_id:'string',
 			name:'string',
 			memberships:['membership']
 		},
 		indexes:[{
 			type:'unique',
-			properties:['id']
+			properties:['_id']
 		},{
 			type:'unique',
 			properties:['name']
@@ -36,13 +35,13 @@ module.exports = Data.define({
 	membership:{
 		extends:Model,
 		properties:{
-			id:'string',
+			_id:'string',
 			user:'user',
 			group:'group'
 		},
 		indexes:[{
 			type:'unique',
-			properties:['id']
+			properties:['_id']
 		},
 		{
 			type:'unique',

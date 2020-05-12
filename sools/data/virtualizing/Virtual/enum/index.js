@@ -6,5 +6,6 @@ module.exports = {
 	model:require("./Model"),
 	collection:require("./Collection"),
 	context:require("./Context"),
-	hasMany:require("./HasMany")
+	hasMany:require("./HasMany"),
+	query:require("./Query")
 }

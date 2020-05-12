@@ -1,84 +1,107 @@
-const Path = require("./Path");
 const Source = require("../virtualizing/Source")
 const Sources = require("../virtualizing/Source/enum")
-const Executable = require("./Executable")
+const Virtual = require("./Virtual")
 
 module.exports = class Scope{
 	constructor(source){
 		this._source = source;
 		this.parent = null;
 		this.values = [];
+		this.caches = [];
 	}
 
 	get source(){
 		return this._source || this.parent.source
 	}
 
-	async executeExecutable(executable){
-		debugger
-		return await executable.execute();
-	}
-
-	async getValuePath(value, path){
-		if(value instanceof Executable)
-			value = await this.executeExecutable(value)
-		if(value instanceof Path)
-			return new Path([value.value , path].filter((s)=>s).join("."))
-		else if(path){
-			var split = path.split(".");
-			var result = value;
-			for(var segment of split)
-				result = result[segment];
-			return result;
+	async getValue(arg, target){
+		var cache = this.caches.find((cache)=>cache.handler == arg);
+		var value;
+		if(cache){
+			value = cache.value;
 		}
-		else
-			return value
-
-	}
-
-	async getValue(arg, path){
-		if((arg.source instanceof Sources.functionCall) || typeof(arg.source) == "undefined"){
-			return await this.getValuePath(await this.source.processArg(this,arg),path)
+		else{
+			value = await (async ()=>{
+				if(arg.source instanceof Sources.functionCall){
+					return await this.source.processFunctionCall(this,arg.source)
+				}
+				else if(arg.source instanceof Sources.array){
+					var result = [];
+					for(var value of arg.source.values)
+						result.push(await this.getValue(value))
+					return result;
+				}
+				else if(arg.source instanceof Sources.value){
+					return arg.source.value;
+				}
+				else if(!(arg.source instanceof Source) || arg.source instanceof Sources.values){
+					return arg.source
+				}
+				else if(arg.source instanceof Sources.property){
+					var parent = await this.getValue(arg.source.source,Virtual)
+					if(parent instanceof Virtual)
+						return parent.getProperty(arg.source.path)
+					else
+						return parent[arg.source.path]
+				}
+				else if(arg.source instanceof Sources.var){
+					var pair = this.getPair(arg)
+					if(!pair){
+						throw new Error("Pair not found")
+					}
+					return pair.value
+				}
+				else
+					return arg.source
+			})();
+			
+			this.caches.push({
+				handler:arg,
+				value
+			})
+			/**/
 		}
-		else if(!(arg.source instanceof Source) || arg.source instanceof Sources.values){
-			return await this.getValuePath(arg.source,path);
+		if(value instanceof Virtual && !(target && value instanceof target)){	
+			value = await value.getValue(this)
 		}
-		else if(arg.source instanceof Sources.property){
-			return await this.getValuePath(await this.getValue(arg.source.source),[arg.source.path,path].filter((s)=>s).join("."));
-		}
-		else if(arg.source instanceof Sources.var){
-			var pair = this.getPair(arg)
-			var value;
-			if(!pair)
-				value = await this.source.processArg(this,arg)
-			else
-				value = pair.value
-			return await this.getValuePath(pair.value,path);
-		}
-	}
-
-	getPairs(arg){
-		return [...this.values.filter((kv)=>kv.arg.source == arg.source),...((this.parent && this.parent.getPairs(arg)) || [])]
+		return value
 	}
 
 	getPair(arg){
-		var pair = this.values.reverse().find((kv)=>kv.arg.source == arg.source);
-		if( pair)
+		var pair = this.values.reverse().find((kv)=>{
+			if(!arg || !kv.arg)
+				debugger
+			return kv.arg.source == arg.source
+		});
+		if(pair)
 			return pair
 		return this.parent && this.parent.getPair(arg);
 	}
 
 	setValue(arg,value){
+		if(!arg || !value){
+			debugger
+			throw new Error()
+		}
 		this.values.push({arg,value});
 	}
 
+	replaceValue(arg,value){
+		var pair = this.getPair(arg);
+		if(pair)
+			pair.value = value;
+		var cache = this.caches.find((cache)=>cache.handler == arg);
+		if(cache)
+			cache.value = value;
+	}
+
 	async process(vscope){
-		for(var statement of vscope.statements){
-			if(statement.functionCall.function.source.name == "return"){
-				return await this.source.processFunctionCall(this,statement.functionCall);
+		for(var functionCall of vscope.statements){
+			if(functionCall.function.name == "return"){
+				return await this.source.processFunctionCall(this,functionCall);
 			}
 			else{
-				await this.source.processFunctionCall(this,statement.functionCall);		
+				await this.source.processFunctionCall(this,functionCall);		
 			}
 		}
 	}

@@ -1,11 +1,11 @@
 var config = require('./config')
-const Scope = require("sools-process/Scope");
+const Scope = require("sools/processing/Scope");
 var http = require("http");
 const express = require("./express");
 const route = require("./route");
 const datas = require("./datas");
 var routesConfig = require("./routes");
-require('./components/passport/setup');
+require('./passport');
 
 
 route.setup(new Scope())

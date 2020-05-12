@@ -3,7 +3,7 @@ const datas = require("./datas");
 const navigator = require("./navigator");
 const notifyService = require("./components/notify/service")
 
-
+/*
 require("sools-ui");
 require("sools-ui/view");
 require("./app.scss")
@@ -49,5 +49,5 @@ var app = {
             })
     }
 }
-
+/**/
 module.exports = app;

@@ -8,7 +8,7 @@ module.exports = Virtualizing.defineType({
 			return:function(source){
 				return new Base.Boolean(new HandlerOptions({source}));
 			},
-			args:(Base)=>[Base,Base]
+			args:(T)=>[T,T]
 		}
 		return ['eq','gt'].reduce((methods,method)=>{
 			methods[method] = definition

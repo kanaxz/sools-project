@@ -1,5 +1,6 @@
 const Scope = require("sools/executing/Scope");
-const Query = require("./Query")
+const Switch = require("./virtuals/SwitchExpression")
+
 module.exports = class MongoScope extends Scope {
 
 		constructor(query, isLookup){
@@ -12,19 +13,25 @@ module.exports = class MongoScope extends Scope {
 			return this._query || this.parent._query
 		}
 
-		async executeExecutable(executable){
-			var queries = [this.query];
-			if(this.isLookup)
-				queries.push(this.parent.query);
-			if(executable instanceof Query){
-				var current = executable
-				 while(current){
-				 	if(queries.indexOf(current) != -1){
-				 		return executable
-				 	}
-				 	current = current.parent;
-				 }
-			}	
-			return super.executeExecutable(executable);
+		child(query,isLookup){
+			var child = new MongoScope(query,isLookup);
+			child.parent = this;
+			return child;
+		}
+
+		async process(scope){
+			var result = await super.process(scope);
+			var swtch
+			if(result instanceof Switch)
+				swtch = result
+			else if(typeof(result) != "undefined")
+				return result;
+			else if(this.switch){
+				swtch = this.switch;
+				delete this.switch
+			}
+			if(swtch && typeof(swtch.$switch.default) == "undefined")
+					swtch.$switch.default = null;
+			return  swtch
 		}
 }

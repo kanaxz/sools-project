@@ -1,23 +1,22 @@
 var Process = require("./Process");
 
 class Dynamic extends Process {
-    constructor(setupFn, executeFn) {
+    constructor(options) {
         super();
-        this.setupFn = setupFn;
-        this.executeFn = executeFn;
+        this.options = options
     }
 
-    setup(scope, next) {
-           if (this.setupFn)
-            return this.setupFn(scope, next);
+    async setup(scope, next) {
+        if (this.options.setup)
+            return await this.options.setup(scope, next);
         else
             return next();
     }
 
 
-    execute(scope, next) {
-        if (this.executeFn)
-            return this.executeFn(scope, next);
+    async execute(scope, next) {
+        if (this.options.execute)
+            return await this.options.execute(scope, next);
         else
             return next();
     }

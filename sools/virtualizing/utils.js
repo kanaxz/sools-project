@@ -1,4 +1,9 @@
 const stringUtils = require("../string/utils")
-module.exports = {
-	gererateVariableId:()=>"var_" + stringUtils.generateUniqueString(10)
+
+var utils = {
+	gererateVariableId(){
+		return "var_" + stringUtils.generateUniqueString(10)
+	}
 }
+
+module.exports = utils;

@@ -1,6 +1,6 @@
 const Virtualizing = require("../../index");
 const Base = require("./Base");
-
+const HandlerOptions = require("../../Handler/Options")
 module.exports = Virtualizing.defineType({
 	name:'number',
 	extends:Base,
@@ -10,16 +10,12 @@ module.exports = Virtualizing.defineType({
 		}
 	},
 	methods:(Number)=>{
-		return ['add','substract','multiply','divide','modulo'].reduce((methods,method)=>{
+		return ['add','subtract','multiply','divide','modulo'].reduce((methods,method)=>{
 			methods[method] = {
-				call:function(arg2){
-					return {
-						arg1:this,
-						arg2
-					}
-				},
 				return:function(source){
-					return new Number({source});
+					return new Number(new HandlerOptions({
+						source
+					}));
 				},
 				args:[Number,Number]
 			}

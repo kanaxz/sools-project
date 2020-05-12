@@ -1,4 +1,4 @@
-var Process = require("sools-process/Process")
+var Process = require("sools/processing/Process")
 var Request = require('./Request')
 class Route extends Process {
 	constructor(params){
