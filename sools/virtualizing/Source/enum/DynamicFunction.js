@@ -9,15 +9,14 @@ module.exports = class DynamicFunction extends BaseFunction {
 	constructor(arg){
 		super();
 		if(arg instanceof Scope)
-			this.scope =arg;
+			this.scope = arg;
 		else{
 			var options = arg;
 			var argNames = Meta.getParamNames(options.fn);
 			var sources = argNames.map((argName)=>{
 					return new FunctionArg(argName,this)
 			})
-		
-		
+
 			this.scope = options.scope.child();
 			var fnArgs;
 			if(typeof(options.args) == "function") 
@@ -32,8 +31,8 @@ module.exports = class DynamicFunction extends BaseFunction {
 		}
 	}
 
-	getArgs(){
-		return this.scope.args;
+	buildArgs(scope,args){
+		return args;
 	}
 
 

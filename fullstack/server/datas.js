@@ -3,43 +3,39 @@ const Mongodb = require("sools-mongodb/Source");
 const Controller = require("sools/data/virtualizing/workers/Controller")
 const AutoLoad = require("sools/data/virtualizing/workers/AutoLoad")
 const Load = require('sools/data/virtualizing/workers/Load')
-
+const config = require("./config")
 const Memory = require("sools/executing/Memory")
 const controls = require("../shared/controls")
 const models = require("../shared/models");
-const Context = require("sools/data/virtualizing/Virtual/enum/Context")
-
-Context.registerProperties({
-  user:models.user
-})  
-
+const constantes = require("../shared/constantes");
 
 var datas = new Datas({
-	context:Context,
-  init:(datas,context)=>{
-    context.user.load({
-      memberships:{
-        group:true
-      }
-    })
+  init:(context)=>{
+  	return
+  	IF(context.user,()=>{
+  		LOG("context.user",context.user.load({
+	      memberships:{
+	      	group:true
+	      }
+	    }))	
+  	})
   },
-  models,
   virtualization:[
-    
-    new AutoLoad(), 
-    new Load(),
-    new Controller(controls)
-    /**/],
+   	new Controller(controls),
+		new Load(),
+	],
+  models,
+  constantes
 })
 
 datas
-  
+	.then((scope,next)=>{
+		console.log(JSON.stringify(scope.scope,null," "))
+		return next()
+	})
   .then(new Memory({
     handlers:[
-      new Mongodb({
-        url:'mongodb://localhost',
-        db:'sandbox'
-      })],
+    	...Memory.handlers(),
+      new Mongodb(config.mongo)],
   }))
-/**/
 module.exports = datas;

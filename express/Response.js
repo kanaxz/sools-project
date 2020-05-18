@@ -1,16 +1,25 @@
 var Process = require("sools/processing/Process")
-var Request = require('./Request')
+
 class Route extends Process {
-	constructor(params){
+	constructor(source){
 		super();
-		this.source = params.source;
+		this.source = source;
 	}
 
-	execute(scope, next){
-		var request = scope.get(Request);
-		var datas = this.source(scope);
-		request.res.json(datas);
-		return super.execute(scope, next);
+	async execute(scope, next){
+		console.log("res");
+		
+		try{
+			await super.execute(scope, next);
+			console.log("here1")	
+			var datas = this.source(scope);
+			scope.res.json(datas || null);
+		}
+		catch(e){
+			console.log("here2",e)	
+			scope.res.status(500).send(e.message);
+		}
+		
 	}
 }
 

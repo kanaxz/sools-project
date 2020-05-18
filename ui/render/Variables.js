@@ -15,8 +15,9 @@ class Variables extends Tree {
             var name = arguments[0];
             var value = arguments[1];
             var existing = this.getByName(name);
-            if(existing)
-                throw new Error(`Variable '${name}'' already exists`);
+            if(existing){
+              //throw new Error(`Variable '${name}'' already exists`);
+            }
             this.push([name, value]);
         }
     }

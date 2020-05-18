@@ -4,9 +4,10 @@
     "description": "",
     "main": "server/app.js",
     "scripts": {
-        "test": "mocha $(find test -name 'test.js')",
+        "test": "node test/index.js",
+        "test-debug": "node --inspect-brk test/index.js",
         "server": "node server/app.js",
-        "client": "webpack-dev-server --inline"
+        "client": "webpack-dev-server --inline --host 0.0.0.0"
     },
     "author": "",
     "license": "ISC",

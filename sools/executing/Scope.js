@@ -15,6 +15,9 @@ module.exports = class Scope{
 	}
 
 	async getValue(arg, target){
+		if(!arg){
+			return null
+		}
 		var cache = this.caches.find((cache)=>cache.handler == arg);
 		var value;
 		if(cache){
@@ -25,6 +28,9 @@ module.exports = class Scope{
 				if(arg.source instanceof Sources.functionCall){
 					return await this.source.processFunctionCall(this,arg.source)
 				}
+				else if(arg.source instanceof Sources.dynamicFunction){
+					return arg.source;
+				}
 				else if(arg.source instanceof Sources.array){
 					var result = [];
 					for(var value of arg.source.values)
@@ -34,8 +40,16 @@ module.exports = class Scope{
 				else if(arg.source instanceof Sources.value){
 					return arg.source.value;
 				}
-				else if(!(arg.source instanceof Source) || arg.source instanceof Sources.values){
+				else if(!(arg.source instanceof Source)){
 					return arg.source
+				}
+				else if(arg.source instanceof Sources.values){
+					var result = {};
+					for(var p in arg.source){
+						
+						result[p] = await this.getValue(arg.source[p]);
+					}
+					return result
 				}
 				else if(arg.source instanceof Sources.property){
 					var parent = await this.getValue(arg.source.source,Virtual)
@@ -47,6 +61,7 @@ module.exports = class Scope{
 				else if(arg.source instanceof Sources.var){
 					var pair = this.getPair(arg)
 					if(!pair){
+						debugger
 						throw new Error("Pair not found")
 					}
 					return pair.value
@@ -79,7 +94,7 @@ module.exports = class Scope{
 	}
 
 	setValue(arg,value){
-		if(!arg || !value){
+		if(!arg){
 			debugger
 			throw new Error()
 		}

@@ -2,20 +2,18 @@ var arrayUtilities = {
     isIterable: (obj) => {
         return typeof obj[Symbol.iterator] === 'function';
     },
-    chain: (array, fn, final, options) => {
-        options = options || {};
+    chain: (array, fn, final, args) => {
         var it = (index, ...args) => {
-            if (options.backward ? index >= 0 : index < array.length) {
+            if (index < array.length) {
                 var obj = array[index];
                 return fn(obj, (...subArgs) => {
-                    return it(options.backward ? index - 1 : index + 1, ...subArgs);
+                    return it(index + 1, ...subArgs);
                 }, ...args);
             } else {
                 return final(...args);
             }
         }
-        var args = options.args || [];
-        return it((options.backward ? array.length - 1 : 0), ...args);
+        return it(0, ...(args || []));
     },
     chainBackward: (array, fn, final, options) => {
         options = options || {};

@@ -21,11 +21,19 @@ var envs = {
 	memory:{
 		async load(scope,functionCall,source){
 			var arg = functionCall.args[0]
-			var query = new Query(new Collection(functionCall.args[0].property.model.typeName + "s",source))
+			var type = arg.constructor.virtual;
+			if(type.prototype instanceof Virtuals.hasMany){
+				type = type.template;
+			}
+			debugger
+			var query = new Query(new Collection(type.typeName + "s",source))
 			var child = utils.childScope(scope, query);
 			child.setValue(functionCall.args[1].source.scope.args[0],query)
 			query = await child.process(functionCall.args[1].source.scope)
 			var result = await query.getValue(scope);
+			if(!(arg.virtual instanceof Virtuals.hasMany)){
+				result = result[0]
+			}
 			var parent = await scope.getValue(arg.source.source); 
 			parent[arg.source.path] = result;
 			return null
@@ -48,7 +56,7 @@ var envs = {
 			}
 			else if(type == Virtuals.hasMany){
 				var hasMany = functionCall.args[0]
-				from = hasMany.type.typeName + "s"
+				from = hasMany.template.typeName + "s"
 			}
 			var subMongoQuery = new Query();
 			var child = utils.childScope(scope, subMongoQuery,true);

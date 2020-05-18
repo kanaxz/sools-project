@@ -9,7 +9,7 @@ module.exports = class Datas extends Virtual {
 		this.datas = datas
 	}
 
-	getProperty(collectionName){
+	getProperty(collectionName){		
 		return new Collection(collectionName,this.source)
 	}
 }

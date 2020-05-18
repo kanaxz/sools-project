@@ -4,7 +4,7 @@ const utils = require("../utils")
 const Handler = require("./Handler");
 const Virtuals = require("sools/data/virtualizing/Virtual/enum")
 const Unhandleable = require("sools/executing/Unhandleable")
-
+const mongo = require("mongodb");
 module.exports = class Collection extends Handler {
 	async processFunctionCall(scope, functionCall){
 		if(functionCall.function.type == Virtuals.collection){
@@ -20,7 +20,28 @@ module.exports = class Collection extends Handler {
 	async push(scope ,functionCall){
 		var collection = await scope.getValue(functionCall.args[0]);
 		var models = await scope.getValue(functionCall.args[1]);
-		await collection.insertMany(models);
-		return null
+		var properties = functionCall.args[0].template.properties;
+		models = await collection.insertMany(models.map((model)=>{
+			var result = {};
+			for(var p in model){
+				var property = properties[p];
+				var value = model[p]
+				if((property.type.prototype instanceof Virtuals.model)){
+					value = {
+						_id:new mongo.ObjectId(value._id)
+					}
+				}
+				else if(property.type.prototype instanceof Virtuals.hasMany){
+					continue
+				}
+				else{
+					if(p == "_id")
+						value = new mongo.ObjectId(model[p])
+				}
+				result[p] = value
+			}
+			return result
+		}));
+		return models
 	}
 }

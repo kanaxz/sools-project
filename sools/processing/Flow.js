@@ -4,27 +4,30 @@ const arrayUtils = require("../Array/utils");
 class Flow extends Process {
     constructor() {
         super();
-        this.process = [];
+        this.processArray = [];
     }
 
-    _process(methodName, scope, next) {
-        return arrayUtils.chain(this.process, (process, next)=>{
+    async _process(methodName, scope) {
+        return await arrayUtils.chain(this.processArray, (process, next)=>{
             return process[methodName](scope, next);
         },()=>{
             return Promise.resolve(0)
-        }).then(next);
+        })
     }
 
-    setup(scope, next) {
-        return this._process("setup", scope, next);
+    async setup(scope, next) {
+        await this._process("setup", scope, next);
+        return next();
     }
 
-    execute(scope, next) {
-        return this._process("execute", scope, next);
+    async execute(scope, next) {
+        await this._process("execute", scope, next);
+        return next();
     }
 
-    stop(scope, next) {
-        return this._process("stop", scope, next);
+    async stop(scope, next) {
+        await this._process("stop", scope, next);
+        return next();
     }
 
     then(process) {
@@ -39,7 +42,7 @@ class Flow extends Process {
             }
             
         }
-        this.process.push(process);
+        this.processArray.push(process);
         return (this);
     }
 }

@@ -1,4 +1,4 @@
-const Process = require("sools-process/Process");
+const Process = require("sools/processing/Process");
 const Request = require("./Request");
 const ajax = require("./ajax");
 class RequestLauncher extends Process {
@@ -9,22 +9,19 @@ class RequestLauncher extends Process {
         this.type = params.type
     }
 
-    execute(scope, next) {
-        var xhr = scope.get(XMLHttpRequest);
-        if (!xhr){
-            xhr = new XMLHttpRequest();
-            scope.push(xhr)
-        }
-        var datas = this.source(scope);
-        return ajax({
-            xhr: xhr,
-            datas: datas,
-            url: this.url,
-            type:this.type
-        }).then((xhr) => {
-            return super.execute(scope, next);
-        })
-
+    async execute(scope, next) {
+      var xhr = scope.xhr;
+      if (!xhr){
+          xhr = new XMLHttpRequest();
+          scope.xhr = xhr
+      }
+      var datas = this.source(scope);
+      scope.result = await ajax({
+          xhr: xhr,
+          datas: datas,
+          url: this.url,
+          type:this.type
+      })
     }
 }
 

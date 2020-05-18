@@ -1,8 +1,8 @@
 var ajax = require("sools-browser/ajax");
 var datas = require("datas");
 const sools = require("sools");
-const Propertiable = require("sools-define/Propertiable");
-const Properties = require("sools-define/Properties");
+const Propertiable = require("sools/Propertiable");
+const Properties = require("sools/Propertiable/Properties");
 const AuthService = sools.define([Propertiable()], (base) => {
     class AuthService extends base {
         constructor(baseUrl) {

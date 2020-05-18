@@ -4,15 +4,15 @@ var HOME_VIEW = "home";
 var datas = require("./datas");
 //var authService = require("./components/user/authService")
 var notifyService = require("./components/notify/service")
-class HederaNavigator extends Navigator {
+class AppNavigator extends Navigator {
 
 	constructor() {
 		super();
 	}
 
-	start(presenter) {
+	async start(presenter) {
 		this.presenter = presenter;
-		return super.start();
+		await super.start();
 	}
 
 	linkChanged(event) {
@@ -44,14 +44,12 @@ class HederaNavigator extends Navigator {
 		return authService.me || route.page.options.name == AUTH_VIEW;
 	}
 
-	routeTriggered(route, viewDatas) {
+	async routeTriggered(route, viewDatas) {
 		if (this.validateRoute(route)) {
 			var page = route.page;
-			return Promise.resolve(page.options.view())
-				.then((View) => {
-					View.register(route.page.options.name);
-					return this.presenter.display(new View(viewDatas), View.layout);
-				})
+			var View = (await page.options.view()).default;
+			View.register(route.page.options.name);
+			await this.presenter.display(new View(viewDatas), View.layout)
 		} else {
 			return this.navigate(AUTH_VIEW, {
 				url: encodeURIComponent(window.location.pathname)
@@ -73,9 +71,9 @@ class HederaNavigator extends Navigator {
 		})
 	}
 
-	home() {
-		return this.navigate(HOME_VIEW, null, {replaceState:true});
+	async home() {
+		await this.navigate(HOME_VIEW, null, {replaceState:true});
 	}
 }
 
-module.exports = new HederaNavigator();
+module.exports = new AppNavigator();

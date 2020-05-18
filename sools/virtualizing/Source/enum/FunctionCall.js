@@ -19,10 +19,9 @@ module.exports = class FunctionCall extends Source {
 
 	toJSON(){
 		return {
-			...super.toJSON(),
 			function:this.function.toJSON(),
 			args:this.args.map((arg)=>{
-				return arg.toJSON && arg.toJSON() || arg
+				return arg.toJSON() 
 			})};
 	}
 

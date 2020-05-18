@@ -1,6 +1,6 @@
 class RequestError extends Error {
 	constructor(xhr) {
-		super("Request error :" + xhr.responseText);
+		super(xhr.responseText);
 		this.xhr = xhr;
 	}
 }
@@ -27,7 +27,7 @@ function ajax(params) {
 		};
 		xhr.onload = function() {
 			if (xhr.status == 200)
-				resolve(xhr);
+				resolve(xhr.responseText && JSON.parse(xhr.responseText) || null);
 			else
 				reject(new RequestError(xhr));
 		};
@@ -39,10 +39,16 @@ function ajax(params) {
 		}
 
 		var datas = params.datas;
+		/*
 		if (params.hasOwnProperty("processDatas") ? params.processDatas : true && params.datas)
 			datas = JSON.stringify(params.datas);
-		xhr.send(datas);
-
+		/**/
+		try{
+			xhr.send(datas);
+		}
+		catch(e){
+			
+		}
 	});
 }
 ajax.RequestError = RequestError;

@@ -17,6 +17,7 @@ app-loader {
             transition-duration:2s;
             background-color:rgba(116, 185, 255,0.2);
             display:block;
+            z-index:100000;
         }
 
         .content{

@@ -13,9 +13,10 @@ module.exports = Virtualizing.defineType({
 	methods:(Collection)=>{
 		return {
 			push:{
-				jsCall:(args,call)=>{
-					var collection = args.shift()
-					return call(collection,args);
+				return:(functionCall)=>{
+					return new (Array.of(functionCall.args[0].template))(new HandlerOptions({
+						source:functionCall
+					}))
 				},
 				args:(T)=>[T,Array.of(T.template)]
 			},

@@ -27,7 +27,7 @@ module.exports = class Query extends Virtual {
 	async getValue(scope){
 		if(scope instanceof MongoScope)
 			return this;
-		console.log(this.collection.name,JSON.stringify(this.pipeline,null,' '))
+		//console.log(this.collection.name,JSON.stringify(this.pipeline,null,' '))
 		var collection = this.collection.source.db.collection(this.collection.name);
 		var result;
 		if(this.pipeline){

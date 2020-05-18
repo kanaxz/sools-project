@@ -1,4 +1,5 @@
 const Source = require("../index")
+const FunctionCall = require("./FunctionCall")
 
 function findScope(args){
 	for(var arg of args){
@@ -13,29 +14,16 @@ module.exports = class Function extends Source {
 	call(scope, args,fn){
 		args = args.map((arg)=>arg && arg.virtual || arg);
 		//scope = scope.target		
-		var processedArgs = []
-		this.getArgs(args).forEach((argDescription,index)=>{	
-			var t = this;
-			var arg = args[index];
-			if(arg == null){
-				if(argDescription.required){
-					throw new Error();
-				}
-				else
-					return;
-			}
-			else{
-				if(!(arg instanceof argDescription.type)){
-					arg = argDescription.type.handler.buildArg(scope, processedArgs, arg, argDescription);
-				}
-				processedArgs.push(scope.processArg(arg))
-			}
+		args = this.buildArgs(scope,args);
+		[...args].reverse().forEach((arg)=>{
+			scope.processArg(arg);
 		})
-		processedArgs = processedArgs.map((arg)=>arg._handler || arg)
+		args = args.map((arg)=>arg._handler || arg)
+
 		var functionCall = new FunctionCall({
 			scope,
 			function:this,
-			args:processedArgs
+			args
 		})
 		if(fn){
 			fn(functionCall)
@@ -55,11 +43,16 @@ module.exports = class Function extends Source {
 	}
 
 
-	calleable(){
+	calleable(initialScope){
 		return (...args)=>{
-			var scope = findScope(args);
+			var scope = initialScope
 			if(!scope)
+				scope = findScope(args);
+			if(!scope){
+				debugger
 				throw new Error("Scope not found");
+			}
+			
 			return this.call(scope.target,args);
 		}
 	}

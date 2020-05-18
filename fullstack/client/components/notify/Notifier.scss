@@ -7,7 +7,7 @@ app-notifier{
 	height:calc(100% - 20px);
 	pointer-events: none;
 	padding-top:50px;
-	z-index:320;
+	z-index:10000;
 	ui-list{
 		.notification{
 			clear:both;
@@ -19,6 +19,7 @@ app-notifier{
 			cursor: pointer;
 			border:1px solid #000;
 			overflow: hidden;
+			margin-right:50px;
 			&.removing{
 				opacity: 0;
 				height:0;

@@ -9,6 +9,7 @@ const DynamicFunction = require("../../../virtualizing/Source/enum/DynamicFuncti
 const Array = require("../../../virtualizing/Virtual/enum/Array")
 const FunctionCall = require("../../../virtualizing/Source/enum/FunctionCall")
 const Functions = require("../../../virtualizing/functions")
+const utils = require("../../../virtualizing/utils")
 
 function checkFlag(scope){
 	if(typeof(scope[flag]) == "boolean")
@@ -26,9 +27,36 @@ module.exports = class Controller extends Worker{
 	}
 
 	onFunctionCalled(scope, functionCall, result){
-
-		if(functionCall.function == Virtuals.collection.methods.get){
-			var control = this.controls[functionCall.args[0].model.typeName]
+		if(functionCall.function == Virtuals.collection.methods.push){
+			let oldFunctionCall = functionCall
+			if(checkFlag(scope))
+				return;
+			let control = this.controls[oldFunctionCall.args[0].template.typeName]
+			if(!control.add)
+				return
+			let index = scope.statements.indexOf(oldFunctionCall)
+			let newFunctionCall;
+			let save = oldFunctionCall.args[1]
+			new DynamicFunction({
+				scope,
+				args:[oldFunctionCall.args[1]],
+				fn:(models,$)=>{
+					let subScope = $._private
+					subScope[flag] = true
+					let result = control.add($.context,models,$)
+					subScope[flag] = false
+					return result;
+				}
+			}).call(scope,[save.virtual],(functionCall)=>{
+				newFunctionCall = functionCall
+				scope.statements[index] = newFunctionCall;
+			})
+			return new (Array.of(newFunctionCall.args[0].template))(new HandlerOptions({
+				source:newFunctionCall
+			}))
+		}
+		else if(functionCall.function == Virtuals.collection.methods.get){
+			var control = this.controls[functionCall.args[0].template.typeName]
 			if(control && control.get){
 				if(checkFlag(scope))
 					return
@@ -49,25 +77,24 @@ module.exports = class Controller extends Worker{
 			if(checkFlag(scope))
 				return
 			
-			var type = functionCall.args[0];
-			if(type.typeName == "hasMany")
-				type = type.type;
+			var type = functionCall.args[0].constructor.virtual;
+			if(type.prototype instanceof Virtuals.hasMany)
+				type = type.template;
 			if(!this.controls[type.typeName])
 				return
 			
 			var control = this.controls[type.typeName].get
 			if(!control)
 				return
-
 			functionCall.args[1] = new Function(new HandlerOptions({
 				source:new DynamicFunction({
 					scope:functionCall.scope,
-					args:[new Array(new HandlerOptions({
-						type
+					args:[new (Array.of(type))(new HandlerOptions({
+						source:utils.gererateVariableId()
 					}))._handler],
 					fn:(models, $)=>{
 						var scope = $._private;
-						scope[flag] = true;
+						scope[flag] = true;						
 						return control($.context,models,(models)=>{
 							models.forEach((model)=>{
 								model.unload({})

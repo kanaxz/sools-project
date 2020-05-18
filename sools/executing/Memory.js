@@ -2,17 +2,24 @@ const Process = require("../processing/Process");
 const Scope = require("./Scope")
 const Virtual = require("../virtualizing/Virtual")
 const Handler = require("../virtualizing/Handler")
+const ArrayUtils = require("../Array/utils")
 const handlers = [
 	require("./types/Array"),
 	//require("./types/DynamicObject"),
 	require("./types/Functions"),
+	require("./types/Base"),
+	require("./types/Virtual"),
 	//require("./types/Sources")
 ]
 
 module.exports = class Memory extends Process {
 	constructor(options){
 		super();
-		this.handlers = [...options.handlers,...handlers.map((handler)=>new handler())]
+		this.handlers = options.handlers;
+	}
+
+	static handlers(){
+		return handlers.map((handler)=>new handler())
 	}
 
 	async setup(scope, next){
@@ -23,21 +30,23 @@ module.exports = class Memory extends Process {
 	}
 
 	async processFunctionCall(scope, functionCall){
-		for(var handler of this.handlers){
-			var result = await handler.processFunctionCall(scope, functionCall);
-			if(typeof(result) != "undefined")
-				return result
-		}
-		throw new Error(`no handler found for functionCall ${functionCall.function.name}`);
+		return await ArrayUtils.chain(this.handlers,async (handler,next)=>{
+			return await handler.processFunctionCall(scope,functionCall,next)
+		},()=>{
+			throw new Error(`no handler found for functionCall ${functionCall.function.name}`);
+		})
 	}
 
 
 	async execute(scope, next){
 		var vscope = scope.scope;
 		var workingScope = new Scope(this);
-		workingScope.setValue(vscope.getVar('context'),scope.context);
+		for(var v in scope.vars){
+			workingScope.setValue(vscope.getVar(v),scope.vars[v]);	
+		}
+		
 		for(var handler of this.handlers){
-			handler.init(workingScope,vscope)
+			await handler.init(workingScope,vscope)
 		}
 		var result = await workingScope.process(vscope);
 		scope.result = result;

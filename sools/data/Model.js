@@ -1,5 +1,5 @@
 var sools = require("../../sools");
-var Propertiable = require("../propertying/Propertiable");
+var Propertiable = require("../Propertiable");
 const Data = require("./index")
 const VModel = require("./virtualizing/Virtual/enum/Model")
 
@@ -23,5 +23,7 @@ var Model = Data.defineType({
 	}),
 	virtual:VModel
 }) 
+
+Data.model = Model;
 
 module.exports = Model;

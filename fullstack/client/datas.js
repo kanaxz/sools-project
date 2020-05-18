@@ -1,29 +1,43 @@
-const sools = require("sools");
-const ModelInterfaces = require("sools-data/ModelInterfaces");
-const models = require("./models");
-const Stores = require("sools-data/storing/Stores");
-const Query = require("sools-data/Query");
-const RequestLauncher = require("sools-browser/RequestLauncher");
-var modelInterfaces = new ModelInterfaces(models)
-    .then(new RequestLauncher({
-        url: '/datas',
-        type: 'POST',
-        source: (scope) => {
-            return {
-                queries: scope.getAll(Query)
-            }
-        }
-    }))
-    .then(function(scope, next) {
-        var xhr = scope.get(XMLHttpRequest);
-        var queries = scope.getAll(Query);
-        var results = JSON.parse(xhr.responseText);
-        for (var i = 0; i < queries.length; i++) {
-            queries[i].setResult(modelInterfaces, results[i])
-        }
-        return next();
-    })
+const Datas = require("sools/data/Datas");
+const Context = require("sools/data/Context");
+const constantes = require("../shared/constantes")
+const RequestLauncher = require("sools-browser/RequestLauncher")
+const models = require("../shared/models");
+const constantes = require("../shared/constantes")
 
-window.datas = modelInterfaces
+const AppDatas = class extends Datas {
+	buildContext(){
+		var context = new this.context.type()
+		context.constantes = constantes;
+		return  context;
+	}
 
-module.exports = modelInterfaces;
+	execute(...args){
+		if(args.length == 1){
+			args.unshift(new this.context.type())
+		}
+		return super.execute(...args);
+	}
+}
+
+
+var datas = new AppDatas({
+  models,
+  constantes
+})
+
+datas
+  /**/
+  .then((scope,next)=>{
+  	console.log(JSON.stringify(scope.scope,null,' '))
+  	return next()
+  })
+  .then(new RequestLauncher({
+  	source:(scope)=>{
+  		return JSON.stringify(scope.scope);
+  	},
+  	url:'/datas',
+  	type:'post'
+  }))
+/**/
+module.exports = datas;

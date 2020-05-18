@@ -8,16 +8,15 @@ const Reference = require("../../Handler/Reference")
 const ArraySource = require("../../Source/enum/Array") 
 const Virtual = require("../../Virtual")
 
-const Array = Virtualizing.defineType({
+const VArray = Virtualizing.defineType({
 	name:'array',
 	template:Virtual,
-	handler: class Array extends Handler {
+	handler: class VArray extends Handler {
 
 		constructor(options){
 			super(options)
-			if(!this.ref.refs.template)
-				this.ref.refs.template = new Reference()
-
+			if(!this.ref.template)
+				this.ref.template = new Reference()
 		}
 
 		static buildArg(scope,args,arg, description){
@@ -26,11 +25,18 @@ const Array = Virtualizing.defineType({
 		}
 
 		static parse(scope,array){
+			if(!(array instanceof Array)){
+				debugger
+				throw new Error()
+			}
 			array = array.map((value)=>{
 				if(!(value instanceof this.template)){
 					value = this.template.handler.parse(scope,value);
 				}
 				return value._handler || value;
+			});
+			[...array].reverse().forEach((value)=>{
+				scope.processArg(value);
 			})
 			return new this.virtual(new HandlerOptions({
 				scope,
@@ -43,8 +49,16 @@ const Array = Virtualizing.defineType({
 		}
 	},
 	class:(base)=>{
-		return class Array extends base{
-
+		return class CArray extends base{
+			constructor(options){
+				if(!options){
+					options = {
+						source:new ArraySource()
+					}
+				}
+				
+				super(options);
+			}
 			[Symbol.iterator](){
 				var object;
 				var scope;
@@ -67,28 +81,45 @@ const Array = Virtualizing.defineType({
 			}
 		}
 	},
-	methods:((Array)=>{
+	methods:((VArray)=>{
 		var fnArg = {
 			type:Function,
 			required:true,
 			args:(scope, args,argNames)=>{
-				debugger
 				return [new args[0].template(new HandlerOptions({
 					scope,
 					source:argNames[0],
-					ref:args[0].ref.refs.template
+					ref:args[0].ref.template
 				}))]
 			}
 		}
 		return {
+			indexOf:{
+				args:(T)=>{					
+					return [T,T.template]
+				},
+				return:(functionCall)=>{
+					return new Number(new HandlerOptions({
+						source:functionCall
+					}))
+				}
+			},
+			length:{
+				args:[VArray],
+				return:(functionCall)=>{
+					return new Number(new HandlerOptions({
+						source:functionCall
+					}))
+				}
+			},
 			atIndex:{
 				return:(functionCall)=>{
-					return new functionCall.statment.args[0].template(new HandlerOptions({
+					return new functionCall.args[0].template(new HandlerOptions({
 						source:functionCall
 					}))
 				},
 				args:[
-					Array,
+					VArray,
 					Number
 				]
 			},
@@ -100,7 +131,7 @@ const Array = Virtualizing.defineType({
 					})
 				},
 				args:[
-					Array,
+					VArray,
 					fnArg
 				]
 			},
@@ -108,11 +139,11 @@ const Array = Virtualizing.defineType({
 				return:(functionCall)=>{
 					return new functionCall.args[0].template(new HandlerOptions({
 						source:functionCall,
-						ref:functionCall.args[0].ref.refs.template
+						ref:functionCall.args[0].ref
 					}))
 				},
 				args:[
-					Array,
+					VArray,
 					fnArg
 				]
 			},
@@ -124,13 +155,12 @@ const Array = Virtualizing.defineType({
 					})
 				},
 				args:[
-					Array,
+					VArray,
 					fnArg
 				]
 			},
 			map:{
 				return:(functionCall)=>{
-					debugger
 					var rtrn = functionCall.args[1].source.scope.statements.find((statment)=>statment.functionCall.function.source.name  == 'return').functionCall.args[0];
 					var array = functionCall.args[0];
 					return array.clone({
@@ -139,7 +169,7 @@ const Array = Virtualizing.defineType({
 					})
 				},
 				args:[
-					Array,
+					VArray,
 					fnArg
 				]
 			}
@@ -147,4 +177,4 @@ const Array = Virtualizing.defineType({
 	}),
 })
 
-module.exports = Array;
+module.exports = VArray;

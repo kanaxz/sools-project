@@ -1,3 +1,4 @@
+  
 const Scope = require("./Scope");
 const Virtual =  require("./Virtual")
 const Functions = require("./functions");
@@ -6,7 +7,7 @@ const Builder = require("./Builder")
 
 class Env{
 	constructor(options){
-		this.workers = options.workers;
+		this.workers = options.workers || [];
 		this.initFn = options.initFn;
 		this.types = options.types,
 		this.functions = {...Functions,...(options.functions || {})}
@@ -17,6 +18,7 @@ class Env{
 		rootScope.process(this.initFn);
 		var scope = rootScope.child();
 		scope.process(fn,...rootScope.vars.map((v)=>v.virtual));
+		
 		return scope;
 	}	
 

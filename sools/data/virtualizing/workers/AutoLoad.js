@@ -43,9 +43,8 @@ module.exports = class AutoLoad extends Worker{
 			if(scopeRelated(hold.scope, scope)){
 				console.log(functionCall.function.name)
 				this.holds.splice(i--,1)
-				if(!(['load','eq','unload'].indexOf(functionCall.function.name) != -1 && functionCall.args[0].ref == hold.ref)){
+				if(!(['load','eq','unload'].indexOf(functionCall.function.name) != -1 && functionCall.args.find((arg)=>arg.ref == hold.ref))){
 					if(hold.scope == scope){
-						debugger
 						hold.virtual.constructor.methods.load.innerCall(scope,[hold.virtual],(functionCall)=>{
 							scope.statements.splice(scope.statements.length - 1,0,functionCall)
 						})

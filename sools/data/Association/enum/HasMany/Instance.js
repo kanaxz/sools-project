@@ -1,8 +1,7 @@
 const sools = require("../../../../sools");
-const Array = require("../../../../propertying/Array");
+const Array = require("../../../../Array");
 const Model = require("../../index");
-module.exports = sools.define(Array.of(Model), (base) => {
-    class HasMany extends base {
+module.exports = class HasMany extends Array {
         constructor(property) {
             super();
             this.property = property;
@@ -22,6 +21,10 @@ module.exports = sools.define(Array.of(Model), (base) => {
             this.datas = model.datas;
         }
     }
+    /*
+module.exports = sools.define(Array.of(Model), (base) => {
+    
 
     return HasMany;
 })
+/**/

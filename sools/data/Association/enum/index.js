@@ -1,4 +1,4 @@
-const PropertyTypes = require("../../../propertying/Property/enum")
+const PropertyTypes = require("../../../Propertiable/Property/enum")
 var associations = {
 	hasOne:require("./HasOne"),
 	hasMany:require("./HasMany"),

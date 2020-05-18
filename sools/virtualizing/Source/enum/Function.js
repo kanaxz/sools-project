@@ -1,7 +1,7 @@
-const FunctionCall = require("./FunctionCall")
+
 const BaseFunction = require("./BaseFunction")
 const HandlerOptions = require("../../Handler/Options")
-
+const Value = require("./Value")
  
 function findScope(args){
 	for(var arg of args){
@@ -38,8 +38,37 @@ module.exports = class Function extends BaseFunction {
 		return this.name;
 	}
 
+	buildArgs(scope,args){
+
+		var result = []
+		var argDescriptions = this.getArgs(args);
+		if(!argDescriptions)
+			return result
+		argDescriptions.forEach((argDescription,index)=>{	
+			var t = this;
+			var arg = args[index];
+			if(arg == null){
+				if(argDescription.required){
+					throw new Error();
+				}
+				else
+					return null
+			}
+			if(!(arg instanceof argDescription.type)){
+					arg = argDescription.type.handler.buildArg(scope, result, arg, argDescription);
+			}
+			result.push(arg._handler)
+			
+		})
+		return result;
+	}
+
 	getArgs(){
 		return this.args;
+	}
+
+	innerCall(scope,args){
+		return super.call(scope,args);
 	}
 
 	call(scope, args){

@@ -50,6 +50,10 @@ module.exports = class Array extends Handler{
 		if(!(scope instanceof MongoScope))
 			return
 		var source = await scope.getValue(functionCall.args[0])
+		if(!source){
+			debugger
+			throw new Error()
+		}
 		if(source instanceof Path){
 			if(['find','map','filter'].indexOf(functionCall.function.name) != -1){
 				var object = functionCall.args[1].source.scope.args[0]

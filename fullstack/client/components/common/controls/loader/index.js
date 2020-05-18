@@ -1,6 +1,6 @@
 const sools = require("sools");
 const Definition = require("sools-ui/Definition");
-const Properties = require("sools-define/Properties");
+const Properties = require("sools/Propertiable/Properties");
 var Control = require("sools-ui/Control")
 
 require("./index.scss");

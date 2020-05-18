@@ -3,8 +3,8 @@ var navigator = require("navigator");
 navigator.page({
 		title: "Accueil",
 		name: "home",
-		view: () =>
-			import ("./views/home"),
+		view: async () =>
+			await import ("./views/home"),
 		url: '/'
 	})
 	.route();

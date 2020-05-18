@@ -54,22 +54,13 @@ const Model = Virtual.define({
 					type:Function,
 					args:(scope, args, argNames)=>{
 						return [
-							new (Array.of(args[0].constructor))(new HandlerOptions({
+							new (Array.of(args[0].constructor.virtual))(new HandlerOptions({
 								scope,
 								source:argNames[0]
 							}))
 						]
 					}
 				}
-			]
-		},
-		eq:{
-			return:(functionCall)=>{
-				return new Boolean(new HandlerOptions({source:functionCall}))
-			},
-			args:(T)=>[
-				T,
-				T
 			]
 		}
 	})

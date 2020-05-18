@@ -2,8 +2,7 @@ var MissingArgument = require("../errors/MissingArgument");
 var Base = require("./Base");
 var Definitions = require("./Definitions");
 var Dependencies = require("./Dependencies");
-const rooty= require("rooty")
-rooty("../")
+
 function defaultMixin(base) {
     return class extends base {}
 }

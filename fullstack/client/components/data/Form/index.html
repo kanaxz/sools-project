@@ -1,0 +1,15 @@
+<template as="fieldTemplate">
+    <div class="field" set="{propertyName:propertyName}">
+        <label 
+        	set="{innerText:propertyName}">
+        </label>
+        <div class="content"
+        	init="this.processField(node,property,value)">
+      	</div>
+    </div>
+</template>
+<form onsubmit="return false" on:submit="this.submit(event)">
+    <div id="content" attach>
+    </div>
+    <input type="submit">
+</form>

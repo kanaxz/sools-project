@@ -1,5 +1,5 @@
 const sools = require("sools");
-const BindableFunctions = require("sools-define/BindableFunctions");
+const BindableFunctions = require("sools/BindableFunctions");
 const NotImplemented = require("sools/errors/NotImplemented")
 
 module.exports = sools.define([BindableFunctions()], (base) => {

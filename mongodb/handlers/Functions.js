@@ -17,6 +17,18 @@ module.exports = class Functions extends Handler {
 		}
 	} 
 
+	async delete(scope,functionCall){
+		var root = await utils.getRoot(scope, functionCall.args[0]);
+		var propertyName = await scope.getValue(functionCall.args[1])
+		var split = root.path.split(".")
+		split.shift()
+		root.query.pipeline.push({
+			$unset:[...split,propertyName].join(".")
+		})
+		debugger
+		return null;
+	}
+
 	async set(scope,functionCall){
 		throw new Unhandleable()
 	}

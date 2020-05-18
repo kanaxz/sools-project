@@ -7,5 +7,6 @@ module.exports = {
 	collection:require("./Collection"),
 	context:require("./Context"),
 	hasMany:require("./HasMany"),
-	query:require("./Query")
+	query:require("./Query"),
+	virtual:require("../../../../virtualizing/Virtual")
 }

@@ -31,7 +31,7 @@ const HasMany = Virtualizing.defineType({
 			return:(functionCall)=>{
 				var hasMany = functionCall.args[0];
 				hasMany.ref.isLoaded = false;
-				hasMany.type.ref.isLoaded = false;
+				hasMany.ref.template.isLoaded = false;
 				return hasMany.clone({
 					source:functionCall
 				})
@@ -47,7 +47,7 @@ const HasMany = Virtualizing.defineType({
 			return:(functionCall)=>{
 				var hasMany = functionCall.args[0];
 				hasMany.ref.isLoaded = true;
-				hasMany.ref.refs.template.isLoaded = true;
+				hasMany.ref.template.isLoaded = true;
 				return hasMany.clone({
 					source:functionCall
 				})
@@ -61,11 +61,7 @@ const HasMany = Virtualizing.defineType({
 							new (Array.of(args[0].template))(new HandlerOptions({
 								scope,
 								source:argNames[0],
-								ref:new Reference({
-									refs:{
-										template:args[0].ref.refs.template
-									}
-								})
+								ref:args[0].ref
 							}))
 						]
 					}

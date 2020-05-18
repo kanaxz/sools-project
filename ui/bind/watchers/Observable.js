@@ -1,10 +1,10 @@
 const Watcher = require("./Watcher");
-const Observable = require("sools-define/Propertiable");
+const Propertiable = require("sools/Propertiable");
 class ObservableWatcher extends Watcher {
 
     static handle(object) {
         var dependencies = object.constructor.dependencies;
-        return (dependencies && dependencies.has(Observable))
+        return (dependencies && dependencies.has(Propertiable))
     }
 
     watch() {

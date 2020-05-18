@@ -2,22 +2,9 @@ var BaseScope = require("./BaseScope");
 var html = require("../html");
 const Variables = require("./Variables")
 
-/**
-	@namespace whitecrow.renderer
-*/
 var renderer = {
-    /**
-    	@memberof whitecrow.renderer
-    	@member {Array<whitecrow.renderer.workerDefinition>} workers An array of all the registered workers
-    */
+
     workers: [],
-    /**
-			@public
-			@static
-			@memberof whitecrow.renderer
-			@param {Array<string>} names - The names of the workers to get
-			@return {Array<whitecrow.renderer.workerDefinition>} An array of workerDefinition that match the names array
- 		*/
     getWorkersByNames: function(names) {
         var result = [];
         for (var i = 0; i < this.workers.length; i++) {
@@ -30,15 +17,6 @@ var renderer = {
         }
         return result;
     },
-    /**
-    	Register a worker by name
-    	The name can be use to tell which worker to use in the render process
-    	@public
-    	@static
-    	@memberof whitecrow.renderer
-    	@param {string} name - The name of the worker
-    	@param {whitecrow.worker} worker - An instance of worker
-    */
     registerWorker: function(name, worker) {
         var existingWorker = this.getWorkersByNames([name]);
         if (existingWorker.length === 0) {
@@ -60,43 +38,23 @@ var renderer = {
             worker.object.process(scope.source, node, variables)
         }
     },
-    /**		
-    	@public
-    	@static
-    	@memberof whitecrow.renderer
-    	@param {object} source
-    	@param {web.typedefs.node} target
-    	@param {whitecrow.renderer.renderOptions} renderOptions
-    */
-    render: function(node, scope) {
+    render:async function(node, scope) {
         if (node instanceof Array) {
-            return Promise.all(node.map((n) => {
-                return this.render(n, scope)
-            }));
+        	for(var n of node){
+        		await this.render(n,scope);
+        	}
         }
-        return Promise.resolve(0).then(function() {
-            if (html.isCustomElement(node)) {
-                return customElements.whenDefined(node.tagName.toLowerCase());
-            }
-            return null;
+        if (html.isCustomElement(node)) {
+            await customElements.whenDefined(node.tagName.toLowerCase());
+        }
 
-        }).then(nop => {
-            this.process(node, scope)
-            if (node.processed)
-                return node.processed(scope);
-            else if (node.childNodes != null) {
-                return this.renderContent(node, scope);
-            }
-        })
-
+        this.process(node, scope)
+        if (node.processed)
+            await node.processed(scope);
+        else if (node.childNodes != null) {
+            await this.renderContent(node, scope);
+        }
     },
-    /**	
-    	Render on the first depth level of the children of the node
-    	@public
-    	@static
-    	@memberof whitecrow.renderer
-    	@param {web.typedefs.node} target
-    */
     renderContent: function(node, scope) {
         if (node instanceof Array) {
             return Promise.all(node.map((n) => {
@@ -107,11 +65,6 @@ var renderer = {
             return this.render(childNode, scope);
         }))
     },
-    /**
-    	Destroy a node.	It will call all the workers 'destroy' function	destroy one level deepth node's childs
-    	@memberof whitecrow.renderer
-    	@param {web.typedefs.node} node
-    */
     destroy: function(node) {
         var workers = this.workers;
         for (var i = 0; i < workers.length; i++) {

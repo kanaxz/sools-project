@@ -4,7 +4,12 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 module.exports = {
     entry: "./client/entryPoint",
     devtool: "source-map",
+    watch: true,
+    watchOptions: {
+        poll: true
+    },
     devServer: {
+    		disableHostCheck: true,
         proxy: {
             "/apis/auth": "http://localhost:1234",
             '/assets': "http://localhost:1234",
@@ -16,7 +21,7 @@ module.exports = {
         path: path.resolve(__dirname, "build"),
         filename: '[name].js',
         chunkFilename: '[name].bundle.js',
-        libraryTarget: "amd"
+        libraryTarget: "var"
     },
     resolve: {
         modules: [path.resolve(__dirname, "client"), __dirname, "node_modules"]

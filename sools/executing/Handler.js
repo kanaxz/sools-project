@@ -3,8 +3,8 @@ module.exports = class Handler {
 
 	}
 
-	processFunctionCall(){
-		return;
+	processFunctionCall(scope,processFunctionCall,next){
+		return next();
 	}
 
 	setup(source){

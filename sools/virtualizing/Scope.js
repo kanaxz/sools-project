@@ -6,10 +6,14 @@ const Return = require("./functions/Return")
 const Declare = require("./functions/Declare")
 const utils = require("./utils")
 const String = require("./Virtual/enum/String")
+const Value = require("./Source/enum/Value")
+const Var = require("./Source/enum/Var")
 var id = 0;
 
 function processSource(arg){
+
 	if(arg.source instanceof FunctionCall){	
+		
 		if(arg.scope == arg.scope.target && arg.source == arg.scope.lastStatment){
 			arg.scope.statements.splice(-1,1)
 			arg.scope.removedStatements.push({
@@ -26,7 +30,7 @@ function processSource(arg){
 			}
 			var id= utils.gererateVariableId()
 			var variable = arg.clone({
-				source:id,
+				source:new Var(id),
 				scope:arg.scope
 			});
 			var index = arg.scope.statements.indexOf(arg.source);
@@ -34,10 +38,13 @@ function processSource(arg){
 				debugger
 				throw new Error("Could not found statment")
 			}
+			var idVar = new String(new HandlerOptions({
+				source:new Value(id)
+			}))._handler
 			arg.scope.statements.splice(index,1,new FunctionCall({
 				scope:arg.scope,
 				function:Declare,
-				args:[variable,arg.clone({scope:arg.scope,source: arg.source})]
+				args:[idVar,arg.clone({scope:arg.scope,source: arg.source})]
 			}));
 			arg.source = variable._handler.source;
 		}
@@ -48,7 +55,7 @@ function processSource(arg){
 
 class Scope{
 	constructor(env){
-		this.id = id++;
+		this.id = (id++)
 		this._env = env;
 		this.statements = [];
 		this.removedStatements = [];
@@ -68,19 +75,20 @@ class Scope{
 				}
 			},
 			apply:(obj,self,args)=>{
-				return this.parse(args);
+				return this.parse(args[0]);
 			}
 		})
 	}
 
-	parse(args){
+	parse(arg){
 		for(var typeName in this.env.types){
 
-			var type = this.env.types[typeName]			
-			if(type.handler.cast(...args)){
-				return type.handler.parse(this, ...args)
+			var type = this.env.types[typeName]		
+			if(type.handler.cast(arg)){
+				return type.handler.parse(this, arg)
 			}
 		}
+		throw new Error("Could not parse arg");
 	}
 
 	get target(){
@@ -101,14 +109,21 @@ class Scope{
 	process(fn,...args){
 		if(typeof(fn) != "function")
 			debugger
-		var result = fn(...args,this.$);		
+		var processArgs = args.map((arg)=>{
+			if(arg instanceof Scope.function){
+				return arg.calleable(this)
+			}
+			return arg;
+		})
+		var result = fn(...processArgs,this.$);		
 		if(result != null){
 			if(!(result instanceof Virtual))
-				result = this.parse([result])
+				result = this.parse(result)
 			Return.call(this,[result])
 		}
-		if(this.parent)
+		if(this.parent){
 			this.parent._child = null;
+		}
 		
 		this.args = args.map((arg)=>(arg && arg._handler) || arg);
 		return this;
@@ -153,7 +168,7 @@ class Scope{
 	toJSON(){
 		return {
 			argNames:this.args && this.args.filter((arg)=>arg).map((arg)=>{
-				return arg && arg.source.name
+				return arg.source.toJSON && arg.source.toJSON() || arg.source
 			}),
 			statements:this.statements.map((s)=>s.toJSON())
 		}

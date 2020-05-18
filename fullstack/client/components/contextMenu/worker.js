@@ -1,4 +1,4 @@
-const ContextMenu = require("./ContextMenu");
+const ContextMenu = require("./contextMenu");
 const utilities = require("sools-ui/utilities");
 const renderer = require("sools-ui/render/renderer");
 const event = require("sools-ui/event");

@@ -1,7 +1,7 @@
 const sools = require("sools");
 const Definition = require("sools-ui/Definition")
 const Control = require("sools-ui/Control");
-require("./LeftBar.scss")
+require("./Leftbar.scss")
 var UI = require("../UI")
 
 module.exports = sools.define(Control, (base) => {
@@ -24,6 +24,6 @@ module.exports = sools.define(Control, (base) => {
             UI
         },
         name: "main-left-bar",
-        template: require("./LeftBar.html")
+        template: require("./Leftbar.html")
     })
 ])

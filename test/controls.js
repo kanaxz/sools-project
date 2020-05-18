@@ -1,9 +1,18 @@
+const Encrypter = require("./Encrypter")
 module.exports = {
 	user:{
 		get:(context,users,next)=>{
 			return next(users.filter((user)=>{
+				DELETE(user.password)
+				user.load({
+					memberships:true
+				})
+				return users;
 				IF(user.eq(context.user),()=>{
 					return true
+				})
+				user.load({
+					memberships:true
 				})
 				return user.memberships.find((mb)=>{
 					return context.user.memberships.find((cmb)=>{
@@ -34,8 +43,9 @@ module.exports = {
 				})
 			}),(user,save)=>{
 				IF(NOT(user.eq(context.user)),()=>{
-					delete user.password	
+					DELETE(user.password)
 				})	
+				user.password = Encrypter.encrypt(password);
 				save()
 			})
 		}
@@ -90,6 +100,11 @@ module.exports = {
 						IF(membership.user.eq(context.user),()=>{
 							return true;
 						})	
+						membership.load({
+							group:{
+								memberships:true
+							}
+						})
 						return membership.group.memberships.find(
 							(mb)=>mb.user.eq(context.user)
 						)

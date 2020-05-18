@@ -47,19 +47,32 @@ async function work() {
     //await testDatas.setup(new Scope());
     var context = new datas.context.type({
       user:{
-       _id:'5e2f3e7b3909c23d74f71236',
+       _id:'5ebbc600e848a40a46a821b7',
       }
     })
     
+    function feed(datas){
+    	datas.users.get().delete()
+    	datas.memberships.get().delete()
+    	var users = datas.users.push({
+    		_id:"5ebbc600e848a40a46a821b7",
+    		name:'Cédric'
+    	},{
+    		name:'Paul'
+    	})
+    	var groups = datas.groups.get();
+    	datas.memberships.push({
+    		user:users.atIndex(0),
+    		group:groups.atIndex(0)
+    	},{
+    		user:users.atIndex(1),
+    		group:groups.atIndex(1)
+    	})
+    }
     
     var users = await datas.execute(context,(datas, context,$) => {
+    	//feed(datas);    		
     	return datas.users.get()
-    		.filter((user)=>user.name.eq("Cédric"))
-    		.update((user,save)=>{
-    			user.name = 'test'
-    			save()
-    		})
-      /**/
     })
     console.log(JSON.stringify(users,null," "))
 	}

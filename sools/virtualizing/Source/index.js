@@ -5,6 +5,7 @@ module.exports = class Source {
 	}
 
 	toJSON(){
+		throw new Error();
 		return {}
 		return DEBUG ? {id:this.id} : {}
 	}

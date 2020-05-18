@@ -1,1 +1,2 @@
-require("./Notifier");
+require("./Notifier")
+module.exports = require("./service");

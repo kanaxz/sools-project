@@ -5,9 +5,9 @@ const Scope = require("../render/Scope")
 module.exports = sools.define(Control,(base)=>{
 	class Root extends base {
 	
-		start(source){
+		async start(source){
 			this.scope = new Scope(source);
-			return this.initialize();
+			return await this.initialize();
 		}
 	}
 

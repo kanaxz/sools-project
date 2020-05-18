@@ -1,6 +1,6 @@
 const Sources = require("./Source/enum")
 const HandlerOptions = require("./Handler/Options")
-
+const Handler = require("./Handler")
 var Builder = {
 	functionCall(scope, json){
 		var fn;
@@ -14,11 +14,11 @@ var Builder = {
 		else{
 			fn = scope.env.functions[json.function]
 		}
-		if(json.function == "assign"){
+		if(json.function == "declare"){
 			var source = this.virtual(scope,json.args[0])
 			var variable = source._handler.clone({
 				scope,
-				source:json.args[1].replace("$","")
+				source:new Sources.var(json.args[1].replace("$",""))
 			})
 			//scope.vars.push(variable._handler)
 			fn.innerCall(scope,[source,variable])
@@ -34,15 +34,21 @@ var Builder = {
 		return fn.innerCall(scope,args);
 
 	},
-	virtual(scope, arg, fn){
+	virtual(scope, arg){
+		if(arg instanceof Handler){
+			debugger
+			throw new Error()
+		}
 		if(typeof(arg) == "object" && arg.function){
 			return this.functionCall(scope, arg);
 		}
 		else if(typeof(arg) == "string" && arg.startsWith("$")){
 			var split = arg.split(".");
 			var variable = scope.getVar(split[0].replace("$",""))
-			if(!variable)
+			if(!variable){
 				debugger
+				throw new Error("Var not found :" + split[0])
+			}
 			var result = variable.virtual;
 			split.shift();
 			for(var segment of split){
@@ -53,18 +59,7 @@ var Builder = {
 		else if(typeof(arg) == "object" && arg.source && arg.path){
 
 		}
-		else if(arg.argNames && arg.statements){
-			return arg;
-		}
-		else {
-			var types = scope.env.types;
-			for(var typeName in types){
-				var type = types[typeName];
-				if(type.handler.cast(arg)){
-					return type.handler.parse(scope,arg);
-				}
-			}			
-		}
+		
 		return arg;
 	}
 }

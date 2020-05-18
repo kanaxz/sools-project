@@ -7,6 +7,7 @@ module.exports = Data.define({
 		properties:{
 			_id:'string',
 			name:'string',
+			password:'string',
 			memberships:['membership']
 		},
 		indexes:[{

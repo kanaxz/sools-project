@@ -4,9 +4,27 @@ const utils = require("../utils")
 const Handler = require("./Handler");
 const Virtuals = require("sools/data/virtualizing/Virtual/enum")
 const Unhandleable = require("sools/executing/Unhandleable")
+const updateFlag = Symbol('updateFunction')
+const deleteFlag = Symbol('deleteFlag')
 
 module.exports = class QueryHandler extends Handler {
 	async processFunctionCall(scope, functionCall){
+		if(functionCall.function[updateFlag]){
+			var details = functionCall.function[updateFlag];
+			await details.collection.mongo.updateOne({
+				_id:details.model._id
+			},{
+				$set:details.model
+			})
+			return null
+		}
+		if(functionCall.function[deleteFlag]){
+			var details = functionCall.function[deleteFlag];
+			await details.collection.mongo.deleteOne({
+				_id:details.model._id
+			})
+			return null
+		}
 		if([Virtuals.query,Virtuals.array].indexOf(functionCall.function.type) == -1)
 			return
 		var arg = await scope.getValue(functionCall.args[0],Query)
@@ -36,6 +54,45 @@ module.exports = class QueryHandler extends Handler {
 					throw e;
 			}
 		}
+	}
+
+	async update(scope,query,functionCall){
+		var models = await query.getValue(null);
+		for(var model of models){
+			var child = scope.child()
+			functionCall.args[1].source.scope.args[1].source[updateFlag] = {
+				model,
+				collection:query.collection
+			}
+			child.setValue(functionCall.args[1].source.scope.args[0],model);
+			await child.process(functionCall.args[1].source.scope);
+		}
+		return models
+	}
+
+	async delete(scope,query,functionCall){
+		var models = await query.getValue(null);
+		if(functionCall.args[1] == null){
+			await query.collection.mongo.deleteMany({
+				_id:{
+					$in:models.map((m)=>m._id)
+				}
+			})
+		}
+		else{
+			
+			for(var model of models){
+				var child = scope.child()
+				debugger
+				functionCall.args[1].source.scope.args[1].source[deleteFlag] = {
+					model,
+					collection:query.collection
+				}
+				child.setValue(functionCall.args[1].source.scope.args[0],model);
+				await child.process(functionCall.args[1].source.scope);
+			}
+		}
+		return models
 	}
 
 	async forEach(mongoQuery,result){	

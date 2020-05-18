@@ -49,7 +49,7 @@ var utils = {
 					function inner(arg){
 						for(var propertyName in arg.constructor.properties){
 							var property = arg.constructor.properties[propertyName]
-							if(property.type.prototype instanceof utils.model || property.type == utils.hasMany){
+							if(property.type.prototype instanceof utils.model || property.type.prototype instanceof utils.hasMany){
 								if(typeof(options[propertyName]) == "undefined"){
 									if(arg._handler.ref.refs[propertyName] && arg._handler.ref.refs[propertyName].isLoaded)
 										arg[propertyName].unload()

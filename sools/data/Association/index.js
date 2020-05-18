@@ -1,6 +1,6 @@
 const sools = require("../../sools");
 const NotImplemented = require("../../errors/NotImplemented");
-const Property = require("../../propertying/Property");
+const Property = require("../../Propertiable/Property");
 class Association extends Property {
 	constructor(params){
 		super(params);

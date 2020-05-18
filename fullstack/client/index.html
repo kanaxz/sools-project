@@ -1,26 +1,39 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<meta charset="utf-8">
-		<!-- useful if you don't want to add an additionnal '/' before all the scripts urls -->
-		<base href="/">
-		<title><%= htmlWebpackPlugin.options.title %></title>
-		<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-		<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
-		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
-	</head>
-	<body>
-		<ui-root id="root">
-			<ui-presenter 
-				as="presenter"
-				on:link-changed="this.navigator.linkChanged(event)"
-				on:redirecting="this.navigator.redirecting(event)">
-			</ui-presenter>
-			<app-notifier></app-notifier>
-		</ui-root>
 
-		<script type="text/javascript" src="lib/bluebird/bluebird.js"></script>
-		<script type="text/javascript" src="lib/webcomponentsjs/webcomponents-loader.js"></script>
-		<script type="text/javascript" data-main="main.js" src="lib/require/require.js"></script>
-	</body>
+<head>
+    <meta charset="utf-8">
+    <!-- useful if you don't want to add an additionnal '/' before all the scripts urls -->
+    <base href="/">
+    <title>
+        Last Oasis Paradise
+    </title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
+   integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+   crossorigin=""/>
+    <!-- Make sure you put this AFTER Leaflet's CSS -->
+ <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
+   integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
+   crossorigin=""></script>
+</head>
+
+<body>
+    <ui-root id="root">
+        <ui-presenter as="presenter" 
+	        on:link-changed="this.navigator.linkChanged(event)" 
+	        on:redirecting="this.navigator.redirecting(event)">
+        </ui-presenter>
+        <app-notifier></app-notifier>
+    </ui-root>
+    <!--
+    <script type="text/javascript" src="lib/bluebird/bluebird.js"></script>
+    <script type="text/javascript" src="lib/webcomponentsjs/webcomponents-loader.js"></script>
+   
+  -->
+   <script type="text/javascript" data-main="main.js" src="lib/require/require.js"></script>
+</body>
+
 </html>

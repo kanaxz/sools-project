@@ -1,11 +1,11 @@
 var Control = require("../../Control");
 var renderer = require("../../render/renderer");
 const sools = require("sools");
-const Properties = require("sools-define/Properties");
-const Array = require("sools-define/Array")
+const Properties = require("sools/Propertiable/Properties");
+const Array = require("sools/Array")
 const ArrayHandler = require("./handlers/Array");
 const ObservableArrayHandler = require("./handlers/ObservableArray");
-const arrayUtils = require("sools/Array/utils");
+
 module.exports = sools.define(Control, (base) => {
 
 

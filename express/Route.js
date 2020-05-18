@@ -1,6 +1,6 @@
 var Scope = require('sools/processing/Scope');
 var Trigger = require("sools/processing/Trigger")
-var Request = require('./Request')
+
 class Route extends Trigger {
 	constructor(router, url){
 		super();

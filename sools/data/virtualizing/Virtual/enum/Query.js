@@ -5,7 +5,7 @@ const HandlerOptions = require("../../../../virtualizing/Handler/Options")
 const Reference = require("../../../../virtualizing/Handler/Reference")
 const Function = require("../../../../virtualizing/Virtual/enum/Function")
 const Model = require("./Model")
-
+const Sources = require("../../../../virtualizing/Source/enum")
 module.exports = Virtualizing.defineType({
 	name:'query',
 	extends:Array,
@@ -24,15 +24,34 @@ module.exports = Virtualizing.defineType({
 								ref:args[0].ref.refs.template
 							})),new Function(new HandlerOptions({
 								scope,
-								source:argNames[1]
-							})).calleable()]
+								source:new Sources.function({
+									name:argNames[1].name
+								})
+							}))]
 						}
 					}]
 				}
 			},
 			delete:{
-				args:(T)=>[T]
-			}
+				args:(T,args)=>{
+					return [T,{
+						type:Function,
+						required:false,
+						args:(scope,args,argNames)=>{
+							return [new args[0].template(new HandlerOptions({
+								scope,
+								source:argNames[0],
+								ref:args[0].ref.refs.template
+							})),new Function(new HandlerOptions({
+								scope,
+								source:new Sources.function({
+									name:argNames[1]
+								})
+							}))]
+						}
+					}]
+				}
+			},
 		}
 	}
 })

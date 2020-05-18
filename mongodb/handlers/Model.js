@@ -10,11 +10,48 @@ const Unhandleable = require("sools/executing/Unhandleable")
 const MongoScope = require("../Scope")
 const Collection = require("../virtuals/Collection")
 
+var envs = {
+	memory:{
+		async eq(scope, functionCall){
+			var model1 = await scope.getValue(functionCall.args[0])
+			var model2 = await scope.getValue(functionCall.args[1])		
+			debugger
+			if(model2 == null)
+				return model1 == null
+			return model1._id == model2._id
+		}
+	},
+	mongo:{
+		async eq(scope, functionCall){
+			var result = [];
+			for(var arg of functionCall.args){
+				var model = await scope.getValue(arg,Path);
+				var id;
+				if(model instanceof Path)
+					id = [model.value,"_id"].join(".")
+				else
+					id = new mongo.ObjectId(model._id)
+				result.push(id)
+			}
+			return new Expression({
+				$eq:result
+			})
+		}
+	}
+}
+
 module.exports = class Model extends Handler {
 	async processFunctionCall(scope, functionCall){
-		if(functionCall.function.type != Virtuals.model)
+		if(functionCall.function == Virtuals.virtual.methods.eq){
+			if(!(functionCall.args[0].virtual instanceof Virtuals.model)){
+				return
+			}
+		}
+		else if(functionCall.function.type != Virtuals.model)
 			return
-		return await this[functionCall.function.name](scope, functionCall);
+
+		var env = scope instanceof MongoScope ? "mongo":"memory";
+		return await envs[env][functionCall.function.name](scope,functionCall)
 	}
 
 	async update(scope, functionCall){
@@ -30,7 +67,7 @@ module.exports = class Model extends Handler {
 		return null
 	}
 
-		async delete(scope, functionCall){
+	async delete(scope, functionCall){
 		if(scope instanceof MongoScope)
 			throw new Unhandleable()
 		var model = await scope.getValue(functionCall.args[0])
@@ -41,19 +78,5 @@ module.exports = class Model extends Handler {
 		return null
 	}
 
-	async eq(scope, functionCall){
-		var result = [];
-		for(var arg of functionCall.args){
-			var model = await scope.getValue(arg,Path);
-			var id;
-			if(model instanceof Path)
-				id = [model.value,"_id"].join(".")
-			else
-				id = new mongo.ObjectId(model._id)
-			result.push(id)
-		}
-		return new Expression({
-			$eq:result
-		})
-	}
+	
 }

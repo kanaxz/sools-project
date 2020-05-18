@@ -8,39 +8,31 @@ const Var = require("../Source/enum/Var")
 var id = 0;
 class Handler {
 	constructor(options){
-		var source = options.source;
 		this.id  = id++
 		this.virtual = options.virtual;
-		if(!this.virtual)
+		if(!this.virtual){
 			debugger
+			throw new Error()
+		}
+		this.source = options.source
+		if(!this.source){
+			debugger
+			throw new Error();
+		}
 		this.typeName = this.virtual.constructor.typeName;
-		/*
-		if(source && source.path)
-			console.log(this.id,source.path,!!options.ref)
-		/**/
 		this.ref = options.ref || new Reference();
 		this.ref.type = this.virtual.constructor;
-		if(source == null)
-			return
-		
-		if(this.typeName != "string" && typeof(source) == "string"){
-			source = new Var(source);
-		}
-		/**/
-
 		var scope = options.scope
 		if(!scope)
-			scope = source.scope;
-		if(source instanceof Var){
-			if(!scope.vars){
+			scope = this.source.scope;
+		if(this.source instanceof Var){
+			if(!scope){
 				debugger
 				throw new Error("Scope not found")
 			}
 			scope.vars.push(this);
 		}
 		this.scope = scope;
-		this.source = source;
-		
 	}	
 
 	get template(){
@@ -91,9 +83,6 @@ class Handler {
 		}))
 
 		this.ref.refs[property.name] = virtual._handler.ref;
-		this.scope.env.workers.forEach((worker)=>{
-			worker.onPropertyGet(property, this.virtual,virtual)
-		})
 		return virtual;
 	}
 
@@ -102,19 +91,23 @@ class Handler {
 	}
 
 	static buildArg(scope,args,arg, description){
-		return scope.parse([arg])
-		//return new this.virtual(arg);
+		debugger
+		return scope.parse(arg);
 	}
 
 	static parse(scope, value){
 		return new this.virtual(new Options({
-			source:value,
-			scope
+			scope,
+			source:value
 		}))
 	}
 
 
 	toJSON(){
+		if(!this.source){
+			debugger
+			throw new Error()
+		}
 		if(this.source.toJSON){
 			return this.source.toJSON()	
 		}
