@@ -1,0 +1,28 @@
+<form 
+	onsubmit="return false"
+	on:submit="this.submit()">
+		<form-selector 
+			as="type" 
+			on-property-changed="{
+				value=>this.ressource.type = value
+			}"
+			set="{
+				values:this.ressourceTypes,
+				value:this.@ressource && this.ressource.@type,
+				as:'ressourceType'
+			}">
+			<template as="template">
+				<div class="ressource">
+					<img set="{src:'./assets/images/ressources/' + ressourceType + '.png'}">
+					<span set="{innerText:ressourceType}"></span>
+				</div>
+			</template>
+		</form-selector>
+		<input type="string" required as="input" bind="{value:this.@ressource && this.build() || ''}">
+		<input type="number" as="x" required bind="{value:this.@ressource && this.ressource.position.x}">
+		<input type="number" as="y" required bind="{value:this.@ressource && this.ressource.position.y}">
+		<input type="submit">
+		<div class="validate" on:click="this.submit()">
+			<i class="fas fa-check"></i>
+		</div>
+</form>

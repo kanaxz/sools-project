@@ -32,7 +32,7 @@ module.exports = class Controller extends Worker{
 			if(checkFlag(scope))
 				return;
 			let control = this.controls[oldFunctionCall.args[0].template.typeName]
-			if(!control.add)
+			if(!control || !control.push)
 				return
 			let index = scope.statements.indexOf(oldFunctionCall)
 			let newFunctionCall;

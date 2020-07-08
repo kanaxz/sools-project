@@ -1,4 +1,10 @@
 .ressource {
+	&.wood{
+		&.icon{
+			background-image: url(/assets/images/ressources/wood.png);
+		}
+	}
+		
 	&.aloe{
 		&.icon{
 			background-image: url(/assets/images/ressources/aloe.png);
@@ -77,21 +83,15 @@
 		}
 	}
 		
-	&.fragment{
+	&.leather{
 		&.icon{
-			background-image: url(/assets/images/ressources/fragment.png);
+			background-image: url(/assets/images/ressources/leather.png);
 		}
 	}
 		
-	&.hide{
+	&.cactusFruit{
 		&.icon{
-			background-image: url(/assets/images/ressources/hide.png);
-		}
-	}
-		
-	&.hugeCactusFruit{
-		&.icon{
-			background-image: url(/assets/images/ressources/hugeCactusFruit.png);
+			background-image: url(/assets/images/ressources/cactusFruit.png);
 		}
 	}
 		
@@ -176,12 +176,6 @@
 	&.whornberry{
 		&.icon{
 			background-image: url(/assets/images/ressources/whornberry.png);
-		}
-	}
-		
-	&.wood{
-		&.icon{
-			background-image: url(/assets/images/ressources/wood.png);
 		}
 	}
 		

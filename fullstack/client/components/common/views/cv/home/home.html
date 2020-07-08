@@ -1,0 +1,189 @@
+<template as="techTemplate">
+    <div class="tech">
+        <span set="{innerText:tech.name}"></span>
+    </div>
+</template>
+<div>
+    <header>
+        <div class="photo"></div>
+        <div class="infos">
+            <span class="name">Cédric Dessalles</span>
+            <span class="job">Développeur Fullstack</span>
+            <ui-list class="infos" set="{
+							source:[{						
+								class:'link',
+								icon:'fas fa-at',
+								text:'dessallescedric@gmail.com'
+							},{
+								icon:'fas fa-calendar',
+								text:'01/08/1994 (25 ans)'
+							},{
+								class:'link',
+								icon:'fas fa-phone',
+								text:'06 49 02 71 90'
+							},{
+								icon:'fas fa-map-marker-alt',
+								text:'Paris, France'
+							}]
+						}">
+                <template as="template">
+                    <div set="{className:object.class}">
+                        <i set="{className:object.icon}"></i>
+                        <span set="{innerText:object.text}"></span>
+                    </div>
+                </template>
+            </ui-list>
+        </div>
+    </header>
+    <div>
+        <div id="presentation">
+            <header>
+                <i class="fas fa-user"></i>
+                <h4>Profil</h4>
+            </header>
+            <div class="content">
+                <p>
+                    Programmeur / Développeur depuis 7 ans et passionné d'informatique depuis toujours.
+                </p>
+                <p>
+                	Je suis spécialisé dans le développement de Programmes et d'Applications (Web et Desktop).
+                </p>
+                <p>
+                	Je suis investi sur les projets sur lesquels je travaille et je fais preuve d'initiative.
+                </p>
+            </div>
+        </div>
+        <div id="professional-experiences">
+            <header>
+                <i class="fas fa-briefcase"></i>
+                <h4>Expériences professionelles</h4>
+            </header>
+            <ui-list class="content" set="{
+            source:this.jobs
+          }">
+                <template as="template">
+                    <div class="job">
+                        <header>
+                            <img set="{src:'/assets/images/cv/' + object.image}">
+                            <div>
+                                <span class="job" set="{innerText:object.job}"></span>
+                                <div class="entreprise">
+                                    <span set="{innerText:object.name}"></span>
+                                    <a set="{href:object.link,innerText:'(' + object.link + ')'}"></a>
+                                </div>
+                            </div>
+                            <div>
+                                <span class="type" set="{innerText:object.type}"></span>
+                                <span class="date" set="{innerText:object.date}"></span>
+                            </div>
+                        </header>
+                        <div>
+                            <ui-list class="projects" set="{source:object.projects,as:'project'}">
+                                <template as="template">
+                                    <div class="project">
+                                        <header>
+                                            <span class="name" set="{innerText:project.name}"></span>
+                                            <a target="_BLANK" set="{className:project.link && 'show',href:project.link,innerText:project.link}">
+                                            </a>
+                                        </header>
+                                        <div>
+                                            <ui-list class="description" set="{source:project.description,as:'line'}">
+                                                <template as="template">
+                                                    <div class="line">
+                                                        <span>-</span>
+                                                        <span set="{innerText:line}"></span>
+                                                    </div>
+                                                </template>
+                                            </ui-list>
+                                            <ui-list class="techs" set="{source:project.techs,as:'tech',template:this.techTemplate}">
+                                            </ui-list>
+                                        </div>
+                                    </div>
+                                </template>
+                            </ui-list>
+                        </div>
+                        <div class="" set="{className:(object.techs ? '' :'hide') + 'other-knowledges'}">
+                            <label>Autres connaissances:</label>
+                            <ui-list class="techs" set="{source:object.techs,as:'tech',template:this.techTemplate}">
+                            </ui-list>
+                        </div>
+                    </div>
+                </template>
+            </ui-list>
+        </div>
+        <div id="personal-projects">
+            <header>
+                <i class="fas fa-tools"></i>
+                <h4>Projets personnels</h4>
+            </header>
+            <div class="content">
+                <ui-list class="projects" set="{source:this.personalProjects,as:'project'}">
+                    <template as="template">
+                        <div class="project">
+                            <header>
+                                <span class="name" set="{innerText:project.name}"></span>
+                                <a target="_BLANK" set="{className:project.link && 'show',href:project.link,innerText:project.link}">
+                                </a>
+                            </header>
+                            <div>
+                                <ui-list class="description" set="{source:project.description,as:'line'}">
+                                    <template as="template">
+                                        <div class="line">
+                                            <span>-</span>
+                                            <span set="{innerText:line}"></span>
+                                        </div>
+                                    </template>
+                                </ui-list>
+                                <ui-list class="techs" set="{source:project.techs,as:'tech',template:this.techTemplate}">
+                                    
+                                </ui-list>
+                            </div>
+                        </div>
+                    </template>
+                </ui-list>
+                <div class="other-knowledges">
+                    <label>Autres connaissances:</label>
+                    <ui-list class="techs" set="{source:this.personalProjects.techs,as:'tech',template:this.techTemplate}">
+                        
+                    </ui-list>
+                </div>
+            </div>
+        </div>
+        <div id="trainings">
+            <header>
+                <i class="fas fa-scroll"></i>
+                <h4>Formations</h4>
+            </header>
+            <div class="content">
+            <ui-list class="projects" set="{source:this.trainings,as:'project'}">
+                <template as="template">
+                    <div class="project training">
+                        <header>
+                            <img set="{src:'/assets/images/cv/'+ project.image}">
+                            <span class="date" set="{innerText:project.date}"></span>
+                            <span class="name" set="{innerText:project.name}"></span>
+                            <span class="school" set="{innerText:project.school}"></span>
+                        </header>
+                        <div>
+                            <ui-list class="techs" set="{source:project.techs,as:'tech',template:this.techTemplate}">
+                            </ui-list>
+                        </div>
+                    </div>
+                </template>
+            </ui-list>
+          </div>
+        </div>
+    </div>
+</div>
+<!-- <div 
+ id="mapid">
+ </div>
+
+	<data-form
+ 		as="form"
+ 		bind:class="{
+ 			show:this.@displayForm
+ 		}"
+ 		style="display:none">
+ 		</data-form>
+ 		-->

@@ -9,8 +9,7 @@ const arrayUtils = require("sools/Array/utils");
 
 module.exports = sools.define(Handler, [BindableFunctions()], (base) => {
   class ObservableArrayHandler extends base {
-    static handle(source) {
-    	console.log("why not",source)
+    static handle(source) {    	
       var constructor = source.constructor;
       return source instanceof Array
     }
@@ -89,7 +88,6 @@ module.exports = sools.define(Handler, [BindableFunctions()], (base) => {
     }
 
     onIndexSet(index, newValue, oldValue) {
-      console.log("index set");
       var existingIteration = this.repeater.iterations.find((it) => {
         return it.object == newValue;
       })

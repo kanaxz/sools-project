@@ -4,7 +4,7 @@ var renderer = require("../render/renderer");
 const sools = require("sools");
 const Properties = require("sools/Propertiable/Properties")
 const Definition = require("../Definition")
-require("./Display.scss") 
+require("./Display.scss")
 module.exports = sools.define(Control, (base) => {
   return class Display extends Control {
     constructor(template, variables) {
@@ -12,28 +12,26 @@ module.exports = sools.define(Control, (base) => {
       this.template = template;
       this.variables = variables;
     }
-    addTemplate() {
-      var result = htmlHelper.getElementFromTemplate(this.template);
-      this.appendChild(result);
-      this.loaded();
-
+    async addTemplate() {
+      this.content = htmlHelper.getElementFromTemplate(this.template);
+      this.appendChild(this.content);
+      await this.loaded();
     }
 
-    initialized() {
-      super.initialized();
-      this.update();
+    async initialized() {
+      await super.initialized();
+      await this.update();
     }
 
-    update() {
+    async update() {
       this.clear();
       var beforeUpdateEvent = new CustomEvent("beforeUpdate", {
         bubbles: false,
         cancelable: true,
       })
       if (this.dispatchEvent(beforeUpdateEvent)) {
-        this.addTemplate();
+        await this.addTemplate();
       }
-
     }
 
     loaded() {
@@ -48,8 +46,11 @@ module.exports = sools.define(Control, (base) => {
       }
     }
 
-    propertyChanged(property) {
-      this.update();
+
+    propertySet(...args) {
+    	super.propertySet(...args);
+    	if(this.isInitialized)
+      	this.update();
     }
 
     clear() {
@@ -59,11 +60,11 @@ module.exports = sools.define(Control, (base) => {
       }
     }
   }
-},[
-	new Properties('template','variables'),
-	new Definition({
-		name:'ui-display',
-		inheritScope:true
-	})
-])
 
+}, [
+  new Properties('template','variables'),
+  new Definition({
+    name: 'ui-display',
+    inheritScope: true
+  })
+])

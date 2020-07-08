@@ -20,17 +20,19 @@ module.exports = sools.define(Control, (base) => {
     		this.build(model,values)
     }
 
+
     async submit(event){
-    	var result = this.getDatas(this.model.virtual,this.content);
+    	this.actions.resolve(this.getDatas(this.model,this.content))
+    	return ;
     	var result = {
     		...this.initialValues,
     		...result
     	}
     	try{
-    		await datas.execute(({db})=>{
-	    		db.ressources.push([result]);	
+    		var models = await datas.execute(({db})=>{
+	    		return db.ressources.push([result]);	
 	    	})	
-	    	this.actions.resolve()
+	    	this.actions.resolve(models[0])
     	}
     	catch(e){
     		notify.display({
@@ -56,9 +58,17 @@ module.exports = sools.define(Control, (base) => {
 	    		result[propertyName] = this.getDatas(property.type,field.querySelector(".content"))
 	    	}
 	    	else{
-	    		var value =  field.querySelector("input").value
-	    		if(property.type == Virtuals.number)
+	    		var input = field.querySelector("input")
+	    		var value =  input.value
+	    		if(property.type == Virtuals.boolean){
+	    			value = input.checked;
+	    		}
+	    		else if(value == "")
+	    				continue
+	    		if(property.type == Virtuals.number){
 	    			value = parseInt(value);
+	    		}
+	    		else 
 	    		result[propertyName] =value
 	    	}
     	}
@@ -79,7 +89,13 @@ module.exports = sools.define(Control, (base) => {
     	}
     	else{
     		element = document.createElement("input");
-    		element.type = property.type.typeName;
+    		if(property.type.typeName == "boolean")
+    			element.type = "checkbox";
+    		else if(property.type.typeName == "datetime"){
+    			element.type = "datetime-local"
+    		}
+    		else
+    			element.type = property.type.typeName;
     		element.value = value || null
     	}
     	field.appendChild(element);
@@ -87,7 +103,9 @@ module.exports = sools.define(Control, (base) => {
 
     buildObjectFields(model,values,options){
     	options = options || {}
+    	values = values || {}
     	var content = document.createDocumentFragment();
+    	console.log("model",model)
     	for(var propertyName in model.properties){
 
     		if(propertyName == "_id" || options[propertyName] === false)
@@ -108,7 +126,7 @@ module.exports = sools.define(Control, (base) => {
     	this.model = model;
     	this.content.innerHTML = ""
     	this.initialValues = values;
-    	var content = this.buildObjectFields(model.virtual,values,options)
+    	var content = this.buildObjectFields(model,values,options)
 
     	this.content.appendChild(content)
     	return new Promise((resolve,reject)=>{

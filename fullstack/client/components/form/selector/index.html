@@ -1,0 +1,65 @@
+<input 
+	required
+	as="input"
+	set="{
+		class:{
+			hide:!this.@active &&  this.@value
+		},
+		value:this.@value || ''
+	}"
+	on:focus="this.updateValues()"
+	on:click="this.updateValues()" 
+	on:blur="this.onBlur(event)"
+	on:keyup="this.keyUp(event)"
+	on:keydown="this.keyDown(event)">
+<input
+	class="hidden-input"
+	on:focus="this.updateValues()"
+	set="{
+		class:{
+			hide:this.@active
+		}
+	}">
+<ui-display
+	as="selectedDisplay" 
+	on:click="this.updateValues()"
+	set="{
+		class:{
+			hide:!this.@value || this.@active
+		},
+		template:this.template,
+		variables:{
+			[this.as]:this.@value
+		}
+	}">
+</ui-display>
+<ui-list 
+	as="list"
+	set="{
+		source:this.@filteredValues,
+		class:{
+			hide:!this.@active
+		}
+	}">
+		<template as="template">
+			<div 
+				class="wrapper" 
+				set="{
+					class:{
+						current:this.@value == object,
+						selected:this.@selectedIndex == it.index
+					}
+				}"
+				on:mousedown="this.itemClicked(object)">
+					<ui-display set="{
+						template:this.template,
+						variables:{
+							[this.as]:object
+						}
+					}">
+					</ui-display>
+			</div>
+		</template>
+</ui-list>
+
+</div>

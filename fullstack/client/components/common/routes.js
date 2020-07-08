@@ -9,3 +9,12 @@ navigator.page({
 	})
 	.route();
 
+navigator.page({
+		title: "Accueil",
+		name: "home",
+		view: async () =>
+			await import ("./views/cv/home"),
+		url: '/cv'
+	})
+	.route();
+

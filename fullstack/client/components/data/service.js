@@ -5,6 +5,7 @@ const HandlerOptions = require("sools/virtualizing/Handler/Options")
 const Sources = require("sools/virtualizing/Source/enum")
 const Memory = require("sools/executing/Memory")
 const handlers = require("./handlers")
+
 var service = {
 	source:new Memory({
 		handlers:[
@@ -48,7 +49,8 @@ var service = {
   		models:[new Model(values,options)],
   		type
   	}
-  	var result = await this.source.execute(scope,()=>{});
+  	var models = await this.source.execute(scope,()=>{});
+  	return models[0]
   }
 }
 

@@ -11,7 +11,7 @@ var binder = {
 		var bindings = this.bindings;
 		for (var i = 0; i < bindings.length; i++) {
 			var binding = bindings[i];
-			if (binding.node == node) {
+			if (binding.dest == node || binding.object == node) {
 				binding.destroy();
 
 				bindings.splice(i--, 1);

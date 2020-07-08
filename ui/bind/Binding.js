@@ -1,17 +1,17 @@
 var BaseBinding = require("./BaseBinding");
 var pathHelper = require("../pathHelper");
 class Binding extends BaseBinding {
-	constructor(object, variables, node, nodePropertyPath, content) {
+	constructor(object, variables, dest, nodePropertyPath, content) {
 		super(object, variables, content);
-		this.node = node;
+		this.dest = dest;
 		this.nodePropertyPath = nodePropertyPath;
 		this.changed();
 	}
 
 	changed() {
 		var result = this.getResult();
-		//console.log("changed", this.nodePropertyPath, result)
-		pathHelper.set(this.node, this.nodePropertyPath, result);
+		
+		pathHelper.set(this.dest, this.nodePropertyPath, result);
 	}
 }
 

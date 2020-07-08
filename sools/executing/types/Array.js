@@ -11,6 +11,14 @@ module.exports = class ArrayHandlere extends Handler {
 		return next();
 	}
 
+	async push(scope, functionCall){
+		var array = await scope.getValue(functionCall.args[0]);
+		var values = await scope.getValue(functionCall.args[1]);
+		array.push(...values);
+
+		return
+	}
+
 	async reduce(){
 
 	}

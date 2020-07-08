@@ -1,6 +1,6 @@
 var propertyIdentifier = "@";
 var stringUtils = require("sools/string/utils");
-var delimiters = '*+-=\'"! :[({})];|'.split('');
+var delimiters = '*+-=\'"! :[({})];|\n\t'.split('');
 var bindHelper = {
     /**
     	@param {string} text

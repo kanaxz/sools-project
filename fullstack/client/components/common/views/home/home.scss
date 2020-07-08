@@ -1,26 +1,6 @@
 home-view {
-    #mapid {
-        height: 100%;
-    }
-
- 
-  	data-form {
-  	    z-index: 1000;
-  	    position: absolute;
-  	}
-
-  	.icon.map{
-  		background-position: center;
-	    background-repeat: no-repeat;
-	    background-size: contain;
-	    text-align: center;
-	    font-weight: bold;
-	    .level{
-	    	color:yellow;
-	    	left:50%;
-	    	top:50%;
-	    	font-size: 18px;
-	    	position: absolute;
-	    }
-  	}
+  canvas{
+  	display:block;
+  	border:1px solid red;
+  } 
 }

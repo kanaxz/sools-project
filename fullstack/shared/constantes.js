@@ -1,4 +1,5 @@
 module.exports = {
+	mapSize:600000,
 	ressourceTypes:[
     "wood",
     "aloe",
@@ -14,7 +15,7 @@ module.exports = {
     "corn",
     "cotton",
     "fiber",
-    "hide",
+    "leather",
     "cactusFruit",
     "insects",
     "ironOre",

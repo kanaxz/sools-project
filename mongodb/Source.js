@@ -34,8 +34,9 @@ module.exports = class Mongodb extends ExecutingHandler {
 	
 		for(var handler of this.handlers){
 			var result = await handler.processFunctionCall(scope, functionCall);
-			if(typeof(result) != "undefined")
+			if(typeof(result) != "undefined"){
 				return result
+			}
 		}
 		return next();
 		

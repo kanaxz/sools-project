@@ -9,130 +9,129 @@ const ObservableArrayHandler = require("./handlers/ObservableArray");
 module.exports = sools.define(Control, (base) => {
 
 
-    class BaseRepeater extends base {
+  class BaseRepeater extends base {
 
-        static getHandlerType(object) {
-            for (var i = this.builders.length - 1; i >= 0; i--) {
-                var builderType = this.builders[i];
-                if (builderType.handle(object))
-                    return builderType;
-            }
-            return null;
-        }
+    static getHandlerType(object) {
+      for (var i = this.builders.length - 1; i >= 0; i--) {
+        var builderType = this.builders[i];
+        if (builderType.handle(object))
+          return builderType;
+      }
+      return null;
+    }
 
-        constructor() {
-            super();
-            this.container = this;
-            this.iterations = [];
-            this.as = "object";
-        }
+    constructor() {
+      super();
+      this.container = this;
+      this.iterations = [];
+      this.as = "object";
+    }
 
-        initialized() {
-            return super.initialized().then(()=>{
-                return this.refresh();    
-            })        
-        }
+    async initialized() {
+      await super.initialized()
+      await this.refresh();
+    }
 
-        clear() {
-            while (this.iterations[0])
-                this.destroyIteration(this.iterations[0])
-        }
+    clear() {
+      while (this.iterations[0])
+        this.destroyIteration(this.iterations[0])
+    }
 
-        sourceChanged(oldSource) {
-            if (oldSource) {
-                this.builder.destroy();
-                this.clear();
-            }
-            if (this.source) {
-                var builderType = this.constructor.getHandlerType(this.source);
-                if (!builderType)
-                    throw new Error("");
+    sourceChanged(oldSource) {
+      if (oldSource) {
+        this.builder.destroy();
+        this.clear();
+      }
+      if (this.source) {
+        var builderType = this.constructor.getHandlerType(this.source);
+        if (!builderType)
+          throw new Error("");
 
-                this.builder = new builderType(this, this.source);
+        this.builder = new builderType(this, this.source);
 
-            }
-            this.refresh();
-        }
+      }
+      this.refresh();
+    }
 
-        // mut be override by subclasses
-        buildElement(it) {
-            throw new Error("You must override the 'buildElement' method from '" + this.constructor.name + "' class");
-        }
+    // mut be override by subclasses
+    buildElement(it) {
+      throw new Error("You must override the 'buildElement' method from '" + this.constructor.name + "' class");
+    }
 
-        /**
-          @virtual
-        */
-        getContainer() {
-            return this;
-        }
+    /**
+      @virtual
+    */
+    getContainer() {
+      return this;
+    }
 
-        canBuild() {
-            return this.source && this.isInitialized
-        }
+    canBuild() {
+      return this.source && this.isInitialized
+    }
 
-        processIteration(it) {
-            this.buildElement(it);
-            var scope = this.parentScope.child();
-            scope.variables.set(this.as, it.object);
-            scope.variables.set(this.as == "object" ? "it" : this.as + "It", it);
-            it.scope = scope;
-            this.iterations.push(it);
-            return (it);
-        }
+    processIteration(it) {
+      this.buildElement(it);
+      var scope = this.parentScope.child();
+      scope.variables.set(this.as, it.object);
+      scope.variables.set(this.as == "object" ? "it" : this.as + "It", it);
+      it.scope = scope;
+      this.iterations.push(it);
+      return (it);
+    }
 
-        insertIteration(it) {
-            var container = this.getContainer();
-            container.appendChild(it.element);
-            return renderer.render(it.element, it.scope);
-        }
+    insertIteration(it) {
+      var container = this.getContainer();
+      container.appendChild(it.element);
+      return renderer.render(it.element, it.scope);
+    }
 
-        processAndInsertIteration(it) {
-            this.processIteration(it);
-            return this.insertIteration(it);
-        }
+    processAndInsertIteration(it) {
+      this.processIteration(it);
+      return this.insertIteration(it);
+    }
 
-        destroyIteration(it) {
-            var index = this.iterations.indexOf(it);
-            if (index == -1)
-                throw new Error("");
+    destroyIteration(it) {
+      var index = this.iterations.indexOf(it);
+      if (index == -1)
+        throw new Error("");
 
-            this.container.removeChild(it.element);
+      this.container.removeChild(it.element);
 
-            //renderer.destroy(it.element);
-            
-            this.iterations.splice(index, 1)
-        }
+      renderer.destroy(it.element);
+
+      this.iterations.splice(index, 1)
+    }
 
 
-        refresh() {
-            
-            if (!this.canBuild())
-                return;
+    refresh() {
 
-            this.clear();
-            return this.builder.forEach((it) => {
-                return this.processAndInsertIteration(it);
-            })
+      if (!this.canBuild())
+        return;
 
-        }
-
-        destructor() {
-            super.destructor();
-        }
-
+      this.clear();
+      return this.builder.forEach((it) => {
+        return this.processAndInsertIteration(it);
+      })
 
     }
-    BaseRepeater.builders = [
-        ArrayHandler,
-        ObservableArrayHandler
-    ];
-    return BaseRepeater;
+
+    destructor() {
+      super.destructor();
+    }
+
+
+  }
+  BaseRepeater.builders = [
+    ArrayHandler,
+    ObservableArrayHandler
+  ];
+  return BaseRepeater;
 }, [
-    new Properties({
-        source: {
-            onSet: function(newValue, oldValue) {
-                this.sourceChanged(oldValue);
-            }
-        }
-    })
+  new Properties({
+    source: {
+      onSet: function(newValue, oldValue) {
+        this.sourceChanged(oldValue);
+      }
+    }
+  })
 ])

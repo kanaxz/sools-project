@@ -1,6 +1,7 @@
 module.exports = class Virtual {
 	getValue(){
-		return this;
+		debugger
+		throw new Error();
 	}
 
 	getProperty(){

@@ -1,0 +1,17 @@
+<div id="ressource-display" attach>
+	<img bind="{
+		src:this.@selectedRessource && './assets/images/ressources/' + this.selectedRessource.type + '.png' || null}">
+</div>
+
+<div 
+id="mapid">
+</div>
+<div id="ressource" attach>
+	<div class="actions">
+		<div on:click="this.lMap.closePopup()" class="close">
+			<i class="fas fa-times"></i>
+		</div>
+	</div>
+	<ressource-form as="form" >
+	</ressource-form>
+</div>

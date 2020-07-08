@@ -90,9 +90,10 @@ class Segment extends BaseSegment {
 class ObservableSegment extends Segment {
     constructor(segmentOption) {
         super(segmentOption);
-        var self = this;
-        this.fn = function() {
-            self.changed();
+
+        this.fn = () =>{
+        	//console.log("triggered",this.referenceSegment.content,this.referenceSegmentRelativePath,this.observablePath.content,this.observablePath.bindFunction.content,this.observablePath.content.length,this.observablePath.bindFunction.content.length)
+          this.changed();
         }        
     }
 
@@ -107,8 +108,12 @@ class ObservableSegment extends Segment {
 
         this.referenceSegment.updateContent();
 
-        if (this.referenceSegment.content)
-            synchronizer.watch(this.referenceSegment.content, this.referenceSegmentRelativePath, this.fn);
+        if (this.referenceSegment.content){
+
+        	//console.log("ready",this.referenceSegment.content,this.referenceSegmentRelativePath,this.observablePath.content,this.observablePath.bindFunction.content,this.observablePath.content.length,this.observablePath.bindFunction.content.length)
+        	synchronizer.watch(this.referenceSegment.content, this.referenceSegmentRelativePath, this.fn);
+        }
+            
     }
 
     clear() {
@@ -118,7 +123,7 @@ class ObservableSegment extends Segment {
     }
 
     changed() {
-        this.observablePath.segmentChanged(this);
+      this.observablePath.segmentChanged(this);
     }
 
     destroy() {
@@ -181,7 +186,7 @@ class ObservablePath {
             startIndex: changedSegment.index + 1
         });
         /**/
-        this.bindFunction.changed();
+        this.bindFunction.beforeChanged();
     }
 
     process() {
@@ -318,6 +323,11 @@ class BaseBinding {
         var result = this.fn();
         return result;
     }
+
+    beforeChanged(){
+    	this.changed();
+    }
+
 
     changed() {
         throw new Error("You must override 'changed' in class '" + this.constructor.name + "'");

@@ -10,7 +10,7 @@ module.exports = sools.define(BaseRepeater, (base) => {
       return this.template && super.canBuild();
     }
 
-    buildElement(it) {
+    buildElement(it) {    	
       var templateType = typeof(this.template);
       var element = null;
       switch (templateType) {
@@ -48,7 +48,8 @@ module.exports = sools.define(BaseRepeater, (base) => {
   new Properties({
     template: Properties.types.any({
       onSet: function() {
-        if (this.itemTemplate && this.template.parentNode == this)
+      	
+        if (this.template && this.template.parentNode == this)
           this.removeChild(this.template);
         this.refresh();
       }

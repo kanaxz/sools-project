@@ -104,6 +104,12 @@ module.exports = class Datas extends Flow {
     })
   }
 
+  buildContext(){
+  	var context = new this.context.type()
+  	context.constantes = this.constantes;
+  	return context;
+  }
+
   async execute(arg1, arg2) {	
     if (arg1 instanceof Context.type) {
       var vscope = this.process(arg2)
@@ -112,11 +118,13 @@ module.exports = class Datas extends Flow {
       	context:arg1
       }
       scope.scope = vscope;
-      scope.context.constantes = this.constantes
-      await super.execute(scope, () => {});
-      return scope.result
+     	arg1.constantes = this.constantes
+      return await super.execute(scope, () => {});
     } else {
-      arg1.context.constantes = this.constantes
+
+      arg1.vars ={
+      	context: this.buildContext()
+      }
       await super.execute(arg1, arg2)
     }
   }

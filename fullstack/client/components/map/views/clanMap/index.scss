@@ -1,0 +1,99 @@
+home-view {
+    position: relative;
+
+    #mapid {
+        height: 100%;
+    }
+
+    .ressources {
+        height: 100%;
+        overflow-y: auto;
+        z-index: 100000;
+        background-color: rgba(#fff, 0.8);
+        right: 0;
+        top: 0;
+        position: absolute;
+
+        .ressource {
+            padding: 5px;
+            margin-bottom: 5px;
+
+            img {
+                width: 25px;
+            }
+
+            span {
+                margin-left: 5px;
+                font-size: 15px;
+            }
+        }
+    }
+
+    .leaflet-popup {
+    	
+    }
+
+    .leaflet-popup-content {
+    	  width: auto !important;
+    	  min-width:301px;
+        margin: 0;
+    }
+
+    .leaflet-popup-content-wrapper {
+        background: none;
+        box-shadow: none;
+    }
+
+    .leaflet-popup-close-button {
+        display: none;
+    }
+
+    #ressource {
+        display: flex;
+        flex-direction: column;
+        background-color: #fff;
+
+        .actions {
+            flex: 25px;
+            align-self: flex-end;
+            display: flex;
+            flex-direction: row;
+            div {
+            	flex:100%;
+            	width:26px;
+            	display:flex;
+							flex-direction: column;
+							justify-content: center;
+							align-items: center;
+            	cursor: pointer;
+                
+                border-left: 1px solid #e1e1e1;
+
+                &.close {
+                    
+                    i {
+                        color: #c55;
+                    }
+                    &:hover{
+                    	background-color:#c55;
+                    	i{
+                    		color:#fff;
+                    	}
+                    }
+
+                }
+
+                i {
+                    font-size: 20px;
+                }
+            }
+        }
+
+        ressource-form {
+        	height:25px;
+        	display:block;
+        }
+    }
+
+    .icon.map {}
+}

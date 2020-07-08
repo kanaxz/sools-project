@@ -9,6 +9,7 @@ const handlers = [
 	require("./types/Functions"),
 	require("./types/Base"),
 	require("./types/Virtual"),
+	require("./types/Number"),
 	//require("./types/Sources")
 ]
 
@@ -42,6 +43,7 @@ module.exports = class Memory extends Process {
 		var vscope = scope.scope;
 		var workingScope = new Scope(this);
 		for(var v in scope.vars){
+			console.log(v)
 			workingScope.setValue(vscope.getVar(v),scope.vars[v]);	
 		}
 		

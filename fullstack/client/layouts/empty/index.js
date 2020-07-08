@@ -5,7 +5,9 @@ require("./empty.scss");
 module.exports = sools.define(Layout, (base) => {
 
     class EmptyLayout extends base {
-
+    	constructor(){
+    		super();
+    	}
 
     }
     return EmptyLayout;

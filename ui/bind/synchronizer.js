@@ -1,4 +1,5 @@
 const ObservableWatcher = require("./watchers/Observable");
+const ObjectWatcher = require("./watchers/Object");
 
 var prv = {
     watcherTypes: [],
@@ -52,5 +53,6 @@ var pblc = {
 
 window.synchronizer = prv;
 pblc.watcher(ObservableWatcher);
+//pblc.watcher(ObjectWatcher);
 
 module.exports = pblc;

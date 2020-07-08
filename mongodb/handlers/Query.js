@@ -55,7 +55,7 @@ module.exports = class QueryHandler extends Handler {
 			}
 		}
 	}
-
+	/*
 	async update(scope,query,functionCall){
 		var models = await query.getValue(null);
 		for(var model of models){
@@ -69,6 +69,7 @@ module.exports = class QueryHandler extends Handler {
 		}
 		return models
 	}
+
 
 	async delete(scope,query,functionCall){
 		var models = await query.getValue(null);
@@ -94,7 +95,7 @@ module.exports = class QueryHandler extends Handler {
 		}
 		return models
 	}
-
+	/**/
 	async forEach(mongoQuery,result){	
 		return mongoQuery
 	}

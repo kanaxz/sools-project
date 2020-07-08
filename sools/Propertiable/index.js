@@ -26,7 +26,7 @@ module.exports = sools.mixin([Buildable(), Comparable()], (base) => {
                   return this._values[property.name];
                 },
                 set: function(newValue) {
-                  this.setValue(property, newValue)
+                  this._setValue(property, newValue)
                 }
               })
             } catch (e) {
@@ -80,11 +80,11 @@ module.exports = sools.mixin([Buildable(), Comparable()], (base) => {
       this._values = {};
 
       if (values) {
-        this.set(values);
+        this._set(values);
       }
     }
 
-    set(values) {
+    _set(values) {
       for (var propertyName in values) {
         this[propertyName] = values[propertyName];
       }
@@ -111,10 +111,11 @@ module.exports = sools.mixin([Buildable(), Comparable()], (base) => {
     }
 
     propertySet(propertyName, newValue, oldValue) {
+    	//console.log(propertyName)
       this.onPropertySet.trigger(propertyName, newValue, oldValue)
     }
 
-    setValue(property, newValue, oldValue) {
+    _setValue(property, newValue, oldValue) {
       var oldValue = this._values[property.name];
       newValue = property.transform(this, newValue);
       this.settingProperty(property, newValue, oldValue)

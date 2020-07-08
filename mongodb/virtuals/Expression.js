@@ -8,4 +8,10 @@ module.exports = class Expression extends Virtual{
 		for(var p in values)
 			this[p] = values[p]
 	}
+
+	getValue(scope){
+		if(!(scope instanceof Expression.scope))
+			throw new Error()
+		return this;
+	}
 }

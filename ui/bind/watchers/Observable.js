@@ -7,6 +7,16 @@ class ObservableWatcher extends Watcher {
         return (dependencies && dependencies.has(Propertiable))
     }
 
+    constructor(object){
+    	super(object);
+    	this.watch()
+    }
+
+    destroy(){
+    	this.unwatch();
+    }
+
+
     watch() {
         this.object.onPropertySet.listen(this.b(this.update));
     }

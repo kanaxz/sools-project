@@ -94,6 +94,9 @@ const VArray = Virtualizing.defineType({
 			}
 		}
 		return {
+			push:{
+				args:(T)=>[T,VArray.of(T.template)]
+			},
 			indexOf:{
 				args:(T)=>{					
 					return [T,T.template]

@@ -3,7 +3,6 @@ const Context = require("sools/data/Context");
 const constantes = require("../shared/constantes")
 const RequestLauncher = require("sools-browser/RequestLauncher")
 const models = require("../shared/models");
-const constantes = require("../shared/constantes")
 
 const AppDatas = class extends Datas {
 	buildContext(){
@@ -29,7 +28,7 @@ var datas = new AppDatas({
 datas
   /**/
   .then((scope,next)=>{
-  	console.log(JSON.stringify(scope.scope,null,' '))
+  	//console.log(JSON.stringify(scope.scope,null,' '))
   	return next()
   })
   .then(new RequestLauncher({

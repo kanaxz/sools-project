@@ -46,6 +46,7 @@ module.exports = class Function extends BaseFunction {
 			return result
 		argDescriptions.forEach((argDescription,index)=>{	
 			var t = this;
+			var t4 = argDescriptions;
 			var arg = args[index];
 			if(arg == null){
 				if(argDescription.required){
@@ -53,6 +54,10 @@ module.exports = class Function extends BaseFunction {
 				}
 				else
 					return null
+			}
+			if(typeof(argDescription.type) != "function"){
+				debugger
+				throw new Error()
 			}
 			if(!(arg instanceof argDescription.type)){
 					arg = argDescription.type.handler.buildArg(scope, result, arg, argDescription);

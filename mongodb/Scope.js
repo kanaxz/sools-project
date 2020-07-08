@@ -1,7 +1,9 @@
 const Scope = require("sools/executing/Scope");
+const Expression = require("./virtuals/Expression")
+
 const Switch = require("./virtuals/SwitchExpression")
 
-module.exports = class MongoScope extends Scope {
+class MongoScope extends Scope {
 
 		constructor(query, isLookup){
 			super();
@@ -35,3 +37,6 @@ module.exports = class MongoScope extends Scope {
 			return  swtch
 		}
 }
+
+Expression.scope = MongoScope;
+module.exports = MongoScope;

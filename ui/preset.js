@@ -9,6 +9,7 @@ var eventWorker = require("./event/worker");
 var inWorker = require("./in/worker");
 var classWorker = require("./class/worker");
 var initWorker = require("./init/worker")
+var propertyChangedWorker = require("./propertyChange/worker")
 
 renderer.registerWorker("init", initWorker);
 renderer.registerWorker("set", setWorker);
@@ -17,3 +18,4 @@ renderer.registerWorker("bind", bindWorker);
 renderer.registerWorker("event", eventWorker);
 renderer.registerWorker("class", classWorker);
 renderer.registerWorker("in", inWorker);
+renderer.registerWorker("propertyChanged", propertyChangedWorker);

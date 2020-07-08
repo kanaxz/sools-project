@@ -88,6 +88,7 @@ const VirtualFunction = Virtualizing.defineType({
           Builder.functionCall(child, statement)
         }
         child.args = args.map((arg => arg._handler || arg));
+        child.parent._child = null;
       }
 
       return new this.virtual(new HandlerOptions({

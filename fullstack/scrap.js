@@ -36,6 +36,12 @@ var ressources =  [
     "Worm Silk"
   ]
 
+  var maps = [
+  /*
+  'SleepingGiants',
+  /**/
+  'CanyonB']
+
 function buildDir(path) {
   path =  path
   if (!fs.existsSync(path)) {
@@ -49,7 +55,7 @@ async function updloadImage(url, path,fn) {
       .on('response', (res) => {
         debugger
         if (res.statusCode != 200)
-          return reject()
+          return reject(new Error(`Status code ${res.statusCode} ${url}`))
         if (fn)
           fn()
         res.pipe(fs.createWriteStream(path))
@@ -61,7 +67,15 @@ async function updloadImage(url, path,fn) {
 }
 
 async function work() {
-  scrapRessources()
+	try{
+  //scrapRessources()
+  await scrapMaps()
+  }
+  catch(e){
+  	debugger
+  	console.log(e)
+  	throw e
+  }
 }
 
 
@@ -88,13 +102,14 @@ async function scrapRessources() {
 
 async function scrapMaps() {
   var path = "./assets/images/maps"
-  for (let map of ['SleepingGiants']) {
+  for (let map of maps) {
     buildDir(path + `/${map}`);
     for (let x = 0; x < 6; x++) {
-      var max = Math.pow(x + 1, 2)
+      var max = Math.pow(2, x)
+      console.log(max)
       for (let y = 0; y < max; y++) {
         for (let z = 0; z < max; z++) {
-          updloadImage(`https://www.shiftingsands.gg/img/Leaflet/Maps/SleepingGiants/${x}/${y}/${z}.png`, `${PATH}/${map}/${x}/${y}/${z}.png`,() => {
+          await updloadImage(`https://www.shiftingsands.gg/img/Leaflet/Maps/${map}/${x}/${y}/${z}.png`, `${path}/${map}/${x}/${y}/${z}.png`,() => {
             buildDir(path + `/${map}/${x}`)
             buildDir(path + `/${map}/${x}/${y}`)
           })

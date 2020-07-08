@@ -7,5 +7,7 @@ module.exports = {
 	object:require("./Object"),
 	string:require("./String"),
 	function:require("./Function"),
-	dynamicObject:require("./DynamicObject")
+	dynamicObject:require("./DynamicObject"),
+	date:require("./Date"),
+	datetime:require("./Datetime")
 }

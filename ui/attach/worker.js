@@ -20,7 +20,7 @@ var attachedWorker = {
 
 			} else if (node.id && node.getAttribute(ATTACH) != null) {
 				obj = object;
-				path = node.id;
+				path = node.id || node.name;
 				node.removeAttribute(ATTACH);
 			}
 			if (obj && path)

@@ -13,6 +13,10 @@ class ArrayHandler extends Handler {
             }))
         })
     }
+
+    destroy(){
+    	
+    }
 }
 
 module.exports = ArrayHandler;
