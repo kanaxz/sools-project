@@ -1,5 +1,10 @@
 module.exports = class Proxy {
-	deleteProperty(instance,property){
-		DELETE(instance[property])
-	}	
+
+  apply(target) {
+    throw new Error(`Cannot apply ${target.constructor.name}`)
+  }
+
+  deleteProperty(instance, property) {
+    DELETE(instance[property])
+  }
 }

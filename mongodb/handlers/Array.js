@@ -1,7 +1,7 @@
 const utils = require("../utils")
 const RootPath = require("../virtuals/RootPath")
 const Path = require("../virtuals/Path")
-const Virtuals = require("sools/data/virtualizing/Virtual/enum")
+const Virtuals = require("sools/modeling/virtualizing/Virtual/enum")
 const MongoScope = require("../Scope")
 const Handler = require("./Handler");
 async function arrayFunctionCallWrapper(scope, functionCall, fn){

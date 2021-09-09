@@ -1,32 +1,15 @@
-  
-const Scope = require("./Scope");
-const Virtual =  require("./Virtual")
-const Functions = require("./functions");
-const Virtuals = require("./Virtual/")
-const Builder = require("./Builder")
-
-class Env{
-	constructor(options){
-		this.workers = options.workers || [];
-		this.initFn = options.initFn;
-		this.types = options.types,
-		this.functions = {...Functions,...(options.functions || {})}
-	}
-
-	process(fn){
-		var rootScope = new Scope(this);
-		rootScope.process(this.initFn);
-		var scope = rootScope.child();
-		scope.process(fn,...rootScope.vars.map((v)=>v.virtual));
-		
-		return scope;
-	}	
-
-	build(scope, json){
-		for(var statement of json.statements){
-			Builder.functionCall(scope, statement);
-		}
-	}
+const Global = require('./Global')
+const Scope = require('./Scope')
+const Env = {
+  global: Global,
+  process(fn) {
+    console.log(this.global)
+    const child = this.global._handler.scope.child()
+    child.process(fn)
+    return child
+  }
 }
 
-module.exports = Env;
+Scope.Env = Env
+
+module.exports = Env

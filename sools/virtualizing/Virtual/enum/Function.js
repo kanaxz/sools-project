@@ -1,25 +1,31 @@
-const Virtualizing = require("../../index");
-const Base = require("./Base");
+const Virtual = require("../index");
+const Handler = require('../../Handler')
 const DynamicFunction = require("../../Source/enum/DynamicFunction")
-const Function = require("../../Source/enum/Function")
+const FunctionSource = require("../../Source/enum/Function")
 const FunctionCall = require("../../Source/enum/FunctionCall")
-const HandlerOptions = require("../../Handler/Options")
-const Handler = require("../../Handler")
-const Return = require("../../functions/Return")
-const Builder = require("../../Builder")
+const sools = require('../../../sools')
+//const Builder = require("../../Builder")
 const FunctionArg = require("../../Source/enum/FunctionArg")
-const Scope = require("../../Scope")
+//const Scope = require("../../Scope")
+const Env = require('../../Env')
 
+console.log('Function')
 
-const VirtualFunction = Virtualizing.defineType({
+const VirtualFunction = Virtual.define({
   name: 'function',
-  extends: Base,
   class: (base) => {
-    class VFunction extends base {
+    return class VirtualFunction extends sools.extends(Function, [base()]) {
+
+      static define(options) {
+        const virtualFunction = super.define(options)
+        virtualFunction.args = options.args || this.args
+        virtualFunction.return = options.return || this.return
+        return virtualFunction
+      }
 
       constructor(...args) {
         var options
-        if (args[0] instanceof HandlerOptions) {
+        if (true) {
           options = args[0];
           if (options.source instanceof Array)
             options.source = new DynamicFunction({
@@ -39,19 +45,86 @@ const VirtualFunction = Virtualizing.defineType({
             })
           })
         }
-        super(options);
+        super(options)
       }
 
-      calleable(scope) {
-        return this._handler.source.calleable(scope)
+      call(...args) {
+        const scope = this._handler.scope.target
+        args = args.map((arg) => arg && arg.virtual || arg)
+        args = this._handler.buildArgs(scope, args)
+        args = args.map((arg) => arg._handler || arg)
+
+        const handlers = [this._handler.thisArg, ...args]
+        handlers.reverse().forEach((arg) => {
+          scope.processArg(arg);
+        })
+
+        const functionCall = new FunctionCall({
+          scope,
+          function: this,
+          args
+        })
+
+        scope.statements.push(functionCall)
+        if (this._handler.return)
+          return this._handler.return(functionCall)
+      }
+    }
+  },
+  proxy: (BaseProxy) => {
+    return class extends BaseProxy {
+      apply(target, thisArg, args) {
+        return target.call(...args)
+      }
+    }
+  },
+  handler: class Function extends Handler {
+
+    constructor(options) {
+      if (!options.thisArg) {
+        options.thisArg = Env.global
+      }
+
+      super(options)
+      this.thisArg = options.thisArg
+      this.return = options.return || this.constructor.virtual.return
+      this.args = options.args || this.constructor.virtual.args
+    }
+
+    buildArgs(scope, args) {
+      args = [...args]
+      var result = [];
+      let descriptions = this.args || []
+      if (typeof this.args === 'function') {
+        descriptions = this.args(this.thisArg.virtual.constructor)
+      }
+      for (let description of descriptions) {
+        if (description.isVirtual) {
+          description = {
+            type: description
+          }
+        }
+
+        const arg = description.type.handler.buildArg({ scope, thisArg: this.thisArg, args, description })
+        if (arg) {
+          result.push(arg._handler)
+        }
+      }
+      return result;
+    }
+
+
+
+    static callAsProperty(thisArg, property) {
+      return {
+        thisArg,
+        args: property.args,
+        return: property.return,
       }
     }
 
-    return VFunction
-  },
-  handler: class Function extends Base.handler {
     static cast(args, fn) {
-      return typeof(fn) == "function"
+      return typeof (fn) == "function"
     }
 
     static parse(scope, args) {
@@ -60,26 +133,24 @@ const VirtualFunction = Virtualizing.defineType({
       return new this.virtual(scope, args)
     }
 
-    static buildArg(scope, args, arg, argDescription) {
+    static buildArg(scope, thisArg, functionCallArgs, arg, argDescription) {
       var dynamicFunction;
-      if (typeof(arg) == "function") {
+      if (typeof (arg) == "function") {
         var options = arg;
         dynamicFunction = new DynamicFunction({
           scope,
           fn: arg,
-          args: (child, sources) => {
-            return argDescription.args &&
-              argDescription.args(child, args, sources) ||
-              []
-          }
+          argDescription,
+          thisArg,
+          functionCallArgs,
         })
-      } else if (typeof(arg) == "object" && arg.argNames && arg.statements) {
+      } else if (typeof (arg) == "object" && arg.argNames && arg.statements) {
         var child = scope.child();
         dynamicFunction = new DynamicFunction(child);
         var args;
-        if (typeof(argDescription.args) == "function") {
+        if (typeof (argDescription.args) == "function") {
           args = argDescription.args(child, args, arg.argNames.map((argName) => {
-            return new FunctionArg(argName.replace("$",""), dynamicFunction)
+            return new FunctionArg(argName.replace("$", ""), dynamicFunction)
           }))
         } else
           args = argDescription.args || []
@@ -91,15 +162,18 @@ const VirtualFunction = Virtualizing.defineType({
         child.parent._child = null;
       }
 
-      return new this.virtual(new HandlerOptions({
+      return new this.virtual({
         scope,
         source: dynamicFunction
-      }));
+      })
     }
+
+
   }
 })
 
-Scope.function = VirtualFunction;
-Handler.function = VirtualFunction;
-Function.virtual = VirtualFunction;
-module.exports = VirtualFunction;
+//Scope.function = VirtualFunction
+FunctionSource.virtual = VirtualFunction
+Virtual.Function = VirtualFunction
+console.log("here", !!Virtual.Function)
+module.exports = VirtualFunction

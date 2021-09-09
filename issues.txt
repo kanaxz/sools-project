@@ -1,0 +1,3 @@
+Not able to connect to mongo hosted in Windows from WSL2
+https://github.com/microsoft/WSL/issues/5486#issuecomment-650271057
+https://github.com/microsoft/WSL/issues/5486

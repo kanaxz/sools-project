@@ -3,10 +3,8 @@ const Number = require("./Number");
 const Handler = require("../../Handler");
 const Source = require("../../Source")
 const Property = require("../../Source/enum/Property")
-const Reference = require("../../Handler/Reference")
 const Virtual = require("../index")
 const Values = require("../../Source/enum/Values")
-const HandlerOptions = require("../../Handler/Options")
 
 module.exports = Virtualizing.defineType({
 	name:'dynamicObject',
@@ -15,13 +13,13 @@ module.exports = Virtualizing.defineType({
 			get(object,path){
 				if(typeof(object[path]) != "undefined")
 					return object[path]
-				return new Virtual(new HandlerOptions({
+				return new Virtual({
 					scope:object._handler.scope,
 					source:new Property({
 						source:object._handler,
 						path
 					})
-				}))
+				})
 			}
 		}
 	},
@@ -42,7 +40,6 @@ module.exports = Virtualizing.defineType({
 					if(!(value instanceof Virtual))
 						value = scope.parse(value)._handler;
 					this.source[p] = value
-					this.ref.refs[p] = this.source[p].ref
 				}
 			}
 			/**/

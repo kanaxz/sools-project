@@ -6,6 +6,6 @@ module.exports = class Var extends Source {
 	}
 
 	toJSON(){
-		return "$" + this.name;
+		return this.name;
 	}
 }

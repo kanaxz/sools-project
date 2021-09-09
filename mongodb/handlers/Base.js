@@ -1,4 +1,4 @@
-const Virtuals = require("sools/data/virtualizing/Virtual/enum")
+const Virtuals = require("sools/modeling/virtualizing/Virtual/enum")
 const Virtual = require("sools/virtualizing/Virtual")
 const Path = require("../virtuals/Path")
 const Expression = require("../virtuals/Expression")

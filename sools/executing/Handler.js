@@ -7,7 +7,7 @@ module.exports = class Handler {
 		return next();
 	}
 
-	setup(source){
+	start(source){
 		this.source = source;
 	}
 

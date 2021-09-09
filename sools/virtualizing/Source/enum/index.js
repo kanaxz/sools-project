@@ -7,7 +7,6 @@ module.exports = {
 	values:require("./Values"),
 	assigned:require("./Assigned"),
 	function:require("./Function"),
-	method:require("./Method"),
 	baseFunction:require("./BaseFunction"),
 	dynamicFunction:require("./DynamicFunction"),
 	value:require("./Value"),

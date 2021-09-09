@@ -1,0 +1,15 @@
+- result as object, not scope
+- no worker, only events
+- global scope, processing scopes one by one
+
+global scope
+method as property
+thisArg in functionCall
+proxy for calleable function virtual
+no ref
+
+const controllers = Env.process(()=>{ 
+  //process models controllers
+})
+
+then as an handle in executor, new Controller(controllers)

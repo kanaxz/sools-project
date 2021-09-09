@@ -1,19 +1,18 @@
-const Virtualizing = require("../../index");
-const HandlerOptions = require("../../Handler/Options")
+const Virtualizing = require("../../index")
 const Handler = require("../../Handler")
-const Value = require("../../Source/enum/Value")
-module.exports = Virtualizing.defineType({
-	name:'type',
-	handler:class extends Handler {
-		static buildArg(scope,args,arg, description){
-			return this.parse(scope,arg);
-		}
 
-		static parse(scope, value){
-			return new this.virtual(new HandlerOptions({
-				scope,
-				source:value
-			}))
-		}
-	}
+module.exports = Virtualizing.defineType({
+  name: 'type',
+  handler: class extends Handler {
+    static buildArg({ scope, arg }) {
+      return this.parse(scope, arg)
+    }
+
+    static parse(scope, value) {
+      return new this.virtual({
+        scope,
+        source: value
+      })
+    }
+  }
 })

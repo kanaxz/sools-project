@@ -2,7 +2,7 @@ const Query = require("../virtuals/Query")
 const RootPath = require("../virtuals/RootPath")
 const Path = require("../virtuals/Path")
 const utils = require("../utils")
-const Virtuals = require("sools/data/virtualizing/Virtual/enum")
+const Virtuals = require("sools/modeling/virtualizing/Virtual/enum")
 const Handler = require("./Handler");
 const Collection = require("../virtuals/Collection")
 class Load extends Handler {

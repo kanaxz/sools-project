@@ -1,86 +1,50 @@
-const Scope = require("sools/processing/Scope");
-const Flow = require("sools/processing/Flow");
-const models = require("./models");
-const datas  = require("./datas");
-const Function = require("sools/virtualizing/Virtual/enum/Function")
-const Datas = require("sools/data/Datas");
-var testDatas = new Datas({
-  init:(datas,context)=>{
-    
-  },
-  models,
-  virtualization:[
-    /**/],
-})
 
-global.DEBUG = true
-class EntryPoint extends Flow {
-  async setup(scope){
-    await super.setup(scope, ()=>{});
-    scope.datas.context.registerProperties({
-      user:models.user
-    })    
-  }
-}
-
-var entryPoint = new EntryPoint()
-entryPoint
-  .then(datas)
-
- testDatas
-  .then(async (scope, next)=>{
-
-    
-    scope.scope = datas.build(scope.scope.toJSON())
-    console.log(JSON.stringify(scope.scope,null," "))
-    /**/
-    return next();
-  })
-  .then(datas)
-
-
+const models = require("./models")
+const Datas = require("sools/modeling/Datas");
+const Executor = require('sools/executing/Executor')
+const Env = require('sools/virtualizing/Env')
+const Mongodb = require('sools-mongodb/Source')
 
 async function work() {
+  let executor
+  try {
 
-	try{ 
-		await entryPoint.setup(new Scope());
-    //await testDatas.setup(new Scope());
-    var context = new datas.context.type({
-      user:{
-       _id:'5ebbc600e848a40a46a821b7',
-      }
+    const datas = Datas.build({
+      models,
     })
-    
-    function feed(datas){
-    	datas.users.get().delete()
-    	datas.memberships.get().delete()
-    	var users = datas.users.push({
-    		_id:"5ebbc600e848a40a46a821b7",
-    		name:'Cédric'
-    	},{
-    		name:'Paul'
-    	})
-    	var groups = datas.groups.get();
-    	datas.memberships.push({
-    		user:users.atIndex(0),
-    		group:groups.atIndex(0)
-    	},{
-    		user:users.atIndex(1),
-    		group:groups.atIndex(1)
-    	})
-    }
-    
-    var users = await datas.execute(context,(datas, context,$) => {
-    	//feed(datas);    		
-    	return datas.users.get()
+
+    executor = new Executor({
+      handlers: [
+        new Mongodb({
+          datas,
+          url: 'mongodb://localhost',
+          db: 'sandbox'
+        })]
     })
-    console.log(JSON.stringify(users,null," "))
-	}
-  catch(e){
-  	throw e;
+
+    await executor.start()
+    const scope = Env.process(() => {
+      console.log(OR)
+      return OR(datas.users(), datas.users())
+      return datas
+        .users()
+        .filter((user) => {
+          return user.name.eq("cédric")
+        })
+        .get()
+    })
+
+    console.log(scope.toJSON())
+
+
+    //const users = await executor.process(scope)
+  }
+  catch (e) {
+    throw e
   }
   finally {
-  	await entryPoint.stop();
+    if (executor)
+      await executor.stop();
   }
 }
 
