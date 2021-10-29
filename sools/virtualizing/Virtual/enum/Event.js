@@ -1,19 +1,12 @@
 const Function = require("./Function")
-const Object = require('./Object')
+const Template = require('./Template')
+const Virtual = require('../index')
 
-const EventArguments = Object.define({
+const template = Template.of(Virtual)
 
-})
-
-const template = Template.of(EventArguments)
-
-const Event = Function.define({
-  name: 'event',
-  template,
-  args: [{
-    type: Function,
-    args: [template]
-  }]
-})
-
-module.exports = Event
+module.exports = Function
+  .define({
+    name: 'event',
+    template,
+    args: [() => [null, [template]]]
+  })

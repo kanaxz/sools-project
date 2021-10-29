@@ -1,26 +1,19 @@
-const Virtual = require("../index");
-const Handler = require("../../Handler")
-const Value = require("../../Source/enum/Value")
-const Function = require('./Function')
+const Virtual = require("../index")
+const Boolean = require('./Boolean')
 
-const Base = Virtual.define({
-  name: 'base',
-  methods: (() => {
-    var definition = {
-      args: [THIS],
-      return: Boolean,
-      /*
-      return: function (source) {
-        return new Base.Boolean({ source })
-      },
-      args: (T) => [T]
-      /**/
+const Base = Virtual
+  .define()
+  .methods(() => {
+    return {
+      ...['gt', 'lt', 'eq'].reduce((methods, method) => {
+        methods[method] = [Boolean, [THIS]]
+        return methods
+      }, {}),
+      ...['add', 'subtract', 'multiply', 'divide', 'modulo'].reduce((methods, method) => {
+        methods[method] = [THIS, [THIS]]
+        return methods
+      }, {})
     }
-    return ['gt', 'lt', 'eq'].reduce((methods, method) => {
-      methods[method] = definition
-      return methods
-    }, {})
   })()
-})
 
 module.exports = Base

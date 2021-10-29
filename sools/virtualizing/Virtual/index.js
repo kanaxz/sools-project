@@ -1,13 +1,29 @@
 const stringUtils = require("../../string/utils")
 const Scope = require('../Scope')
 const Handler = require("../Handler")
-var caches = [];
 const VirtualProxy = require("../Proxy")
 const sools = require('../../sools')
 
+var caches = []
+
+const areTemplatesMatching = (templates1, templates2) => {
+  if (templates1.length !== templates2.length) {
+    return false
+  }
+  for (let i = 0; i < templates1.length; i++) {
+    const template1 = templates1[i]
+    const template2 = templates2[i]
+
+    if (template1 !== template2) {
+      return false
+    }
+  }
+  return true
+}
+
 const Virtual = sools.proxy((base) => {
 
-  return class Virtual extends base {
+  return class extends base {
     static isVirtual = true
     constructor(options) {
       super()
@@ -19,28 +35,24 @@ const Virtual = sools.proxy((base) => {
       })
     }
 
-    get template() {
-      return this.constructor.template
+    get templates() {
+      return this.constructor.templates
     }
 
-    static of(template) {
-      if (!this.template || !template || (!template.isVirtual && template != Virtual)) {
-        throw new Error("Not template type")
-      }
-      /*
-      if(typeof(template) == "function"){
-        if(!(template.prototype instanceof this.template)){
-          throw new Error("No");
+    static of(...templates) {
+      for (const template of templates) {
+        if (!template || (template && !template.isVirtual && template != Virtual)) {
+          throw new Error("Not template type")
         }
       }
-      /**/
+
       var cache = caches.find((cache) => {
-        return cache.template == template && cache.extends == this
+        return areTemplatesMatching(cache.templates, templates) && cache.extends == this
       })
       if (!cache) {
         cache = this.define({
-          template,
-          name: `${this.typeName}<${template.typeName}>`
+          templates,
+          isOf: true,
         })
         caches.push(cache)
       }
@@ -67,14 +79,30 @@ const Virtual = sools.proxy((base) => {
         }
       })
       /**/
-      proxy.registerMethods(typeDescription.methods)
-      proxy.registerProperties(typeDescription.properties)
+      proxy.methods(typeDescription.methods)
+      proxy.properties(typeDescription.properties)
 
       proxy.handler = typeDescription.handler || (extend && class extends extend.handler { }) || class extends Handler { }
-      proxy.typeName = typeDescription.name
+
+
+      proxy.templates = []
       if (typeDescription.template)
-        proxy.template = typeDescription.template
-      proxy.target = type;
+        proxy.templates = [typeDescription.template]
+      if (typeDescription.templates) {
+        proxy.templates = typeDescription.templates
+      }
+      proxy.baseName = typeDescription.name || extend.baseName
+      proxy.typeName = proxy.baseName
+      if (proxy.templates.length) {
+        proxy.typeName += `<${proxy.templates.map((template) => { return template.typeName }).join(', ')}>`
+      }
+      for (const template of proxy.templates) {
+        if (template.prototype instanceof Virtual.Template) {
+          template.link(proxy)
+        }
+      }
+
+      proxy.target = type
       proxy.proxy = proxyClass
       proxy.extends = typeDescription.extends
       proxy.handler.virtual = proxy
@@ -83,22 +111,31 @@ const Virtual = sools.proxy((base) => {
     }
 
 
-    static registerMethods(methods) {
+    static methods(methods) {
 
       for (const methodName in methods) {
-        methods[methodName].type = Virtual.Function
+        methods[methodName] = Virtual.Function.define({
+          ...methods[methodName],
+          readonly: true
+        })
       }
-      this.registerProperties(methods)
+      this.properties(methods)
     }
 
-    static registerProperties(properties) {
-      this.properties = { ...this.properties }
+    static properties(properties) {
+      if (!properties) {
+        return this._properties
+      }
+      this._properties = { ...this._properties }
       for (let propertyName in properties) {
         let property = properties[propertyName];
         if (typeof (property) != "object") {
           property = {
             type: property
           }
+        }
+        if (!property.type) {
+          throw new Error(`Property ${propertyName} has no type`)
         }
         property.name = propertyName;
         property.ownerType = this;
@@ -110,8 +147,12 @@ const Virtual = sools.proxy((base) => {
             return this._handler.setProperty(property, value);
           }
         })
-        this.properties[propertyName] = property;
+        this._properties[propertyName] = property;
       }
+    }
+
+    instanceof(type) {
+      return this instanceof type || type === Virtual
     }
 
     toJSON() {

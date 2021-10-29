@@ -1,22 +1,16 @@
 const Property = require("./Source/enum/Property")
 const Var = require("./Source/enum/Var")
 const GlobalScope = require('./GlobalScope')
-//console.log(GlobalScope)
-//const Global = require('../Global')
-//const Virtual = require("../Virtual")
+const Value = require('./Source/enum/Value')
 
-var id = 0;
-class Handler {
+module.exports = class Handler {
   constructor(options) {
-    this.id = id++
     this.virtual = options.virtual;
     if (!this.virtual) {
-      debugger
       throw new Error()
     }
     this.source = options.source
     if (!this.source) {
-      debugger
       throw new Error();
     }
     this.typeName = this.virtual.constructor.typeName
@@ -27,12 +21,12 @@ class Handler {
     }
   }
 
-  get template() {
-    return this.constructor.template;
+  get templates() {
+    return this.constructor.templates;
   }
 
-  static get template() {
-    return this.virtual.template
+  static get templates() {
+    return this.virtual.templates
   }
 
   clone(options) {
@@ -59,43 +53,46 @@ class Handler {
 
   getProperty(property) {
     const source = new Property({
-      source: this,
+      owner: this,
       path: property.name
     })
     if (!property.type) {
       throw new Erorr('')
     }
-    const args = property.type.handler.callAsProperty(this, property)
-    //this.scope.processArg(this)
-    const virtual = new property.type({
+
+    const virtual = property.type.handler.build({
       source,
       scope: this.scope,
-      ...args
     })
 
     return virtual;
   }
 
-  static callAsProperty() {
-    return {};
-  }
+  static buildArg(options) {
+    const { scope, args, description } = options
+    const arg = args.shift()
+    if (arg.constructor.isVirtual)
+      return arg
 
-  static buildArg({ scope, args, description }) {
-    let arg = args.shift()
-    if (arg == null && description.required) {
-      throw new Error()
-    }
-    if (!(arg instanceof description.type)) {
-      arg = this.parse(scope, arg)
-    }
-    return arg
-  }
-
-  static parse(scope, value) {
-    return new this.virtual({
-      scope,
-      source: new Value(value)
+    return this.build({
+      source: this.parseToSource({ arg, ...options }),
+      scope
     })
+  }
+
+  static parseToSource({ arg }) {
+    return new Value(arg)
+  }
+
+  static build(options) {
+    let type = this.virtual
+
+    const virtuals = Handler.Template.getVirtuals(this.templates, options.source)
+    if (virtuals) {
+      type = type.of(...virtuals)
+    }
+
+    return new type(options)
   }
 
 
@@ -115,16 +112,6 @@ class Handler {
   static cast(arg) {
     return false
   }
-  /*
-    static build(scope,arg){
-      return new this(scope,arg);
-    }
-  /**/
 
 }
 
-
-
-
-/**/
-module.exports = Handler;

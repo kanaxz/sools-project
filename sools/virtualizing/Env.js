@@ -1,11 +1,14 @@
 const Global = require('./Global')
 const Scope = require('./Scope')
+const This = require('./Virtual/enum/This')
+const Var = require('./Source/enum/Var')
+
 const Env = {
-  global: Global,
-  process(fn) {
-    console.log(this.global)
-    const child = this.global._handler.scope.child()
-    child.process(fn)
+  global: Global._handler,
+  process(fn, args) {
+  
+    const child = this.global.scope.child()
+    child.process(fn, args)
     return child
   }
 }

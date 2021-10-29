@@ -5,8 +5,6 @@ module.exports = class FunctionCall extends Source {
     for (var p in values) {
       this[p] = values[p]
     }
-    if (!this.function)
-      debugger
     if (this.function._handler)
       this.function = this.function._handler
     if (this.args)

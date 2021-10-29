@@ -1,15 +1,37 @@
-- result as object, not scope
-- no worker, only events
-- global scope, processing scopes one by one
+modify how to define virtuals
 
-global scope
-method as property
-thisArg in functionCall
-proxy for calleable function virtual
-no ref
 
-const controllers = Env.process(()=>{ 
-  //process models controllers
+
+Memory extends sools.mixin([Propertiable()])
+
+class Virtual extends sools.mixin([Propertiable()]){
+  static propertyAdded(property){
+    ...
+  }
+}
+Virtual.extension([...extensions])
+  .properties()
+  .methods()
+
+
+Object.extends([...extensions],{
+  name:'user',
+  pluralName:'users
 })
+.memory((memory)=>{
 
-then as an handle in executor, new Controller(controllers)
+})
+.virtual((virtual)=>{
+
+})
+.handler((handler)=>{
+
+})
+.properties({
+  groups:HasMany.of(Group)
+})
+.methods({
+  toString:[String,()=>{
+    return '{{this.firstName}} {{this.lastName}}'
+  }]
+})

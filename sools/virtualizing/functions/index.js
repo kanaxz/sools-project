@@ -21,13 +21,6 @@ const functions = {
   }),
   cast: new Function({
     source: new Var('cast'),
-    /*
-    return: (source) => {
-      return new functionCall.args[0].source({
-        source
-      })
-    },
-    /**/
     args: [
       Type,
       Virtual
@@ -36,13 +29,6 @@ const functions = {
   get: new Function({
     source: new Var('get'),
     return: Virtual,
-    /*
-    return: (functionCall) => {
-      return new Virtual({
-        source: functionCall
-      })
-    },
-    /**/
     args: [
       Virtual,
       String
@@ -54,14 +40,6 @@ const functions = {
       type: Function,
       required: true,
       args: [Virtual],
-      /*
-      args: (scope, thisArg, args, [source]) => {
-        return [new String({
-          scope,
-          source
-        })]
-      }
-      /**/
     }]
   }),
   throw: new Function({
@@ -72,13 +50,6 @@ const functions = {
     source: new Var('not'),
     args: [Virtual],
     return: Boolean,
-    /*
-    return: (functionCall) => {
-      return new Boolean({
-        source: functionCall
-      })
-    },
-    /**/
   }),
   log: new Function({
     source: new Var('log'),
@@ -106,19 +77,8 @@ const functions = {
     }]
   }),
   delete: new Function({
-    jsCall: (args, call) => {
-      if (args.length == 1) {
-        if (!(args[0]._handler.source instanceof Property))
-          throw new Error();
-        args = [
-          args[0]._handler.source.source,
-          args[0]._handler.source.path
-        ]
-      }
-      return call(...args)
-    },
     source: 'delete',
-    args: [Virtual, String]
+    args: [Virtual]
   }),
   assign: require("./Set"),
   return: require("./Return"),
@@ -127,11 +87,6 @@ const functions = {
     source: new Var('instanceof'),
     args: [Virtual, Virtual]
   }),
-  findByUpperCase(name) {
-    for (var fn in this)
-      if (fn.toUpperCase() == name)
-        return this[fn];
-  }
 }
 
 for (var fnName in functions) {

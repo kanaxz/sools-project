@@ -14,7 +14,6 @@ var Builder = {
       fn = scope.env.functions[json.function]
     }
     if (json.function == "declare") {
-      console.log("here")
       var source = this.virtual(scope, json.args[0])
       var variable = source._handler.clone({
         scope,

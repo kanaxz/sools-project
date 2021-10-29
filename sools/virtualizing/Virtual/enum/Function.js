@@ -1,20 +1,25 @@
-const Virtual = require("../index");
-const Handler = require('../../Handler')
+const Virtual = require("../index")
 const DynamicFunction = require("../../Source/enum/DynamicFunction")
 const FunctionSource = require("../../Source/enum/Function")
 const FunctionCall = require("../../Source/enum/FunctionCall")
 const sools = require('../../../sools')
-//const Builder = require("../../Builder")
-const FunctionArg = require("../../Source/enum/FunctionArg")
-//const Scope = require("../../Scope")
 const Env = require('../../Env')
+const Property = require('../../Source/enum/Property')
 
-console.log('Function')
+const getThisArg = (source) => {
+  if (source instanceof Property) {
+    return source.owner
+  } else {
+    return Env.global._handler
+  }
+}
 
-const VirtualFunction = Virtual.define({
-  name: 'function',
-  class: (base) => {
-    return class VirtualFunction extends sools.extends(Function, [base()]) {
+const VirtualFunction = Virtual
+  .define({
+    name: 'function',
+  })
+  .virtual((Virtual) => {
+    return class VirtualFunction extends sools.extends(Function, [Virtual()]) {
 
       static define(options) {
         const virtualFunction = super.define(options)
@@ -23,157 +28,96 @@ const VirtualFunction = Virtual.define({
         return virtualFunction
       }
 
-      constructor(...args) {
-        var options
-        if (true) {
-          options = args[0];
-          if (options.source instanceof Array)
-            options.source = new DynamicFunction({
-              scope: options.scope,
-              args: options.source[0],
-              fn: options.source[1]
-            })
-        } else {
-          var scope = args[0];
-          var fnArgs = args[1]
-          options = new HandlerOptions({
-            scope: scope,
-            source: new DynamicFunction({
-              scope,
-              args: fnArgs[1],
-              fn: fnArgs[2]
-            })
-          })
-        }
-        super(options)
-      }
-
       call(...args) {
+        const thisArg = getThisArg(this._handler.source)
         const scope = this._handler.scope.target
         args = args.map((arg) => arg && arg.virtual || arg)
         args = this._handler.buildArgs(scope, args)
-        args = args.map((arg) => arg._handler || arg)
 
-        const handlers = [this._handler.thisArg, ...args]
+        const handlers = [thisArg, ...args]
         handlers.reverse().forEach((arg) => {
           scope.processArg(arg);
         })
 
         const functionCall = new FunctionCall({
           scope,
-          function: this,
+          function: this._handler,
           args
         })
 
         scope.statements.push(functionCall)
-        if (this._handler.return)
-          return this._handler.return(functionCall)
+        if (this._handler.return) {
+          return this._handler.return.handler.build({
+            source: functionCall,
+            scope,
+          })
+        }
       }
     }
-  },
-  proxy: (BaseProxy) => {
-    return class extends BaseProxy {
+  })
+  .proxy((Proxy) => {
+    return class extends Proxy {
       apply(target, thisArg, args) {
         return target.call(...args)
       }
     }
-  },
-  handler: class Function extends Handler {
+  })
+  .handler((Handler) => {
+    return class Function extends Handler {
 
-    constructor(options) {
-      if (!options.thisArg) {
-        options.thisArg = Env.global
+      constructor(options) {
+        super(options)
+        this.return = options.return || this.constructor.virtual.return
+        this.args = options.args || this.constructor.virtual.args
       }
 
-      super(options)
-      this.thisArg = options.thisArg
-      this.return = options.return || this.constructor.virtual.return
-      this.args = options.args || this.constructor.virtual.args
-    }
-
-    buildArgs(scope, args) {
-      args = [...args]
-      var result = [];
-      let descriptions = this.args || []
-      if (typeof this.args === 'function') {
-        descriptions = this.args(this.thisArg.virtual.constructor)
-      }
-      for (let description of descriptions) {
-        if (description.isVirtual) {
-          description = {
-            type: description
+      buildArgs(scope, args) {
+        args = [...args]
+        var result = [];
+        let descriptions = this.args || []
+        for (let description of descriptions) {
+          if (description.isVirtual) {
+            description = {
+              type: description
+            }
+          }
+          if (!description.type) {
+            throw new Error('Description has no type')
+          }
+          const arg = description.type.handler.buildArg({ fn: this, scope, args, description })
+          if (arg) {
+            result.push(arg._handler)
           }
         }
-
-        const arg = description.type.handler.buildArg({ scope, thisArg: this.thisArg, args, description })
-        if (arg) {
-          result.push(arg._handler)
-        }
+        return result;
       }
-      return result;
-    }
 
-
-
-    static callAsProperty(thisArg, property) {
-      return {
-        thisArg,
-        args: property.args,
-        return: property.return,
+      static cast(args, fn) {
+        return typeof (fn) == "function"
       }
-    }
 
-    static cast(args, fn) {
-      return typeof (fn) == "function"
-    }
+      static parse(scope, args) {
+        throw new Error("parse function trigger");
+        return new this.virtual(scope, args)
+      }
 
-    static parse(scope, args) {
-      debugger
-      throw new Error("parse function trigger");
-      return new this.virtual(scope, args)
-    }
-
-    static buildArg(scope, thisArg, functionCallArgs, arg, argDescription) {
-      var dynamicFunction;
-      if (typeof (arg) == "function") {
-        var options = arg;
-        dynamicFunction = new DynamicFunction({
+      static buildArg({ scope, args, fn, description }) {
+        const arg = args.shift()
+        const source = new DynamicFunction({
           scope,
+          args: description.args,
+          return: description.return,
           fn: arg,
-          argDescription,
-          thisArg,
-          functionCallArgs,
+          owner: fn,
         })
-      } else if (typeof (arg) == "object" && arg.argNames && arg.statements) {
-        var child = scope.child();
-        dynamicFunction = new DynamicFunction(child);
-        var args;
-        if (typeof (argDescription.args) == "function") {
-          args = argDescription.args(child, args, arg.argNames.map((argName) => {
-            return new FunctionArg(argName.replace("$", ""), dynamicFunction)
-          }))
-        } else
-          args = argDescription.args || []
-
-        for (var statement of arg.statements) {
-          Builder.functionCall(child, statement)
-        }
-        child.args = args.map((arg => arg._handler || arg));
-        child.parent._child = null;
+        return new this.virtual({
+          scope,
+          source,
+        })
       }
-
-      return new this.virtual({
-        scope,
-        source: dynamicFunction
-      })
     }
+  })
 
-
-  }
-})
-
-//Scope.function = VirtualFunction
 FunctionSource.virtual = VirtualFunction
 Virtual.Function = VirtualFunction
-console.log("here", !!Virtual.Function)
 module.exports = VirtualFunction

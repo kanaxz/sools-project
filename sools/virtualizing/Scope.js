@@ -46,9 +46,9 @@ function processSource(arg) {
   return arg;
 }
 
-const repeatChar = (char, length)=>{
+const repeatChar = (char, length) => {
   let s = ''
-  for(let i = 0;i<length;i++){
+  for (let i = 0; i < length; i++) {
     s += char
   }
   return s
@@ -85,10 +85,10 @@ class Scope {
     return child;
   }
 
-  process(fn, ...args) {
+  process(fn, args = []) {
     var result = fn(...args)
     if (result != null) {
-      if (!(result instanceof Scope.Virtual))
+      if (!result || !result.constructor.isVirtual)
         result = this.parse(result)
       Scope.Return(result)
     }
@@ -126,9 +126,9 @@ class Scope {
   toJSON() {
     return `${repeatChar(' ', this.level)}(${this.args.map((arg) => arg.toJSON())})=>{
 ${repeatChar(' ', this.level)}${this.statements.map((statment) => {
-        return `${repeatChar(' ', this.level)}${statment.toJSON()}`
-      })
-      .join('\n')}
+      return `${repeatChar(' ', this.level)}${statment.toJSON()}`
+    })
+        .join('\n')}
 ${repeatChar(' ', this.level)}}`
 
   }
